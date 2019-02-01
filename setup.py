@@ -6,6 +6,6 @@ setup(
     version="0.1.0",
     author="raynardj",
     author_email="raynard@rasenn.com",
-    description="Ray's tool for machine learning",
-    py_modules=['matchbox','forge',],
+    description="Ray's tool for managing machine learning",
+    py_modules=['forgebox','forge',],
 )
