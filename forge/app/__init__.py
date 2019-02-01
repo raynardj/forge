@@ -2,6 +2,7 @@ import logging
 from flask import Flask
 from flask_appbuilder import SQLA, AppBuilder
 from .security import MySecurityManager as SecurityManager
+from .utils import create_dir
 
 """
  Logging configuration
@@ -12,6 +13,7 @@ logging.getLogger().setLevel(logging.DEBUG)
 
 app = Flask(__name__)
 app.config.from_object('config')
+create_dir(app.config.get("DATADIR"))
 db = SQLA(app)
 appbuilder = AppBuilder(app, db.session, security_manager_class=SecurityManager)
 security_manager = appbuilder.sm
