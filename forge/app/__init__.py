@@ -1,6 +1,7 @@
 import logging
 from flask import Flask
 from flask_appbuilder import SQLA, AppBuilder
+from .security import MySecurityManager as SecurityManager
 
 """
  Logging configuration
@@ -12,9 +13,8 @@ logging.getLogger().setLevel(logging.DEBUG)
 app = Flask(__name__)
 app.config.from_object('config')
 db = SQLA(app)
-appbuilder = AppBuilder(app, db.session)
-
-
+appbuilder = AppBuilder(app, db.session, security_manager_class=SecurityManager)
+security_manager = appbuilder.sm
 """
 from sqlalchemy.engine import Engine
 from sqlalchemy import event
@@ -28,5 +28,5 @@ def set_sqlite_pragma(dbapi_connection, connection_record):
     cursor.close()
 """    
 
-from app import views
+from . import views
 

@@ -1,7 +1,7 @@
 from flask import render_template
 from flask_appbuilder.models.sqla.interface import SQLAInterface
 from flask_appbuilder import ModelView
-from app import appbuilder, db
+from .. import appbuilder, db
 
 """
     Create your Views::
