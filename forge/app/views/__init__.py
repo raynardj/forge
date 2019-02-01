@@ -24,6 +24,11 @@ from .. import appbuilder, db
 def page_not_found(e):
     return render_template('404.html', base_template=appbuilder.base_template, appbuilder=appbuilder), 404
 
+from .post_view import PostView
+
+web_cate = {"category":"Web", "category_icon":"dashboard"}
+appbuilder.add_view(PostView, "posts", icon="fa-book", **web_cate )
+
 db.create_all()
 
 

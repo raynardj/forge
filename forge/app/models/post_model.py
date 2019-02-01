@@ -2,6 +2,7 @@ from . import db
 from .. import security_manager
 from . import tsMixin
 from flask_appbuilder import Model
+from sqlalchemy.ext.declarative import declared_attr
 
 class postModel(tsMixin,Model):
     __bind_key__ = None
