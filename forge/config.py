@@ -21,7 +21,7 @@ CSRF_ENABLED = True
 APP_NAME = "Forge"
 
 # Uncomment to setup Setup an App icon
-APP_ICON = "static/img/logo.png"
+APP_ICON = "/static/img/logo.png"
 
 #----------------------------------------------------
 # AUTHENTICATION CONFIG
