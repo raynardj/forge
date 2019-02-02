@@ -1,7 +1,3 @@
-from flask_appbuilder import Model
-from flask_appbuilder.models.mixins import AuditMixin, FileColumn, ImageColumn
-from sqlalchemy import Column, Integer, String, ForeignKey 
-from sqlalchemy.orm import relationship
 from datetime import datetime
 from .. import db
 """
@@ -19,5 +15,5 @@ class tsMixin(object):
     updated_at = db.Column(
         db.DateTime, default=datetime.now, onupdate=datetime.now, nullable=True)
 
-from .ml_model import taskModel, hyperParam, dataFormat, weightModel
+from .ml_model import taskModel, hyperParam, dataFormat, weightModel, hyperParamWeight
 from .post_model import postModel

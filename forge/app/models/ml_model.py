@@ -7,7 +7,7 @@ class taskModel(tsMixin,Model):
     __bind_key__ = None
     __tablename__ = "fg_task"
     id = db.Column(db.Integer, primary_key=True)
-    taskname = db.Column(db.String(150)),
+    taskname = db.Column(db.String(150))
     owner_id = db.Column(db.Integer(), db.ForeignKey("ab_user.id"), nullable=True)
     remark = db.Column(db.Text(),nullable = True)
 
@@ -18,7 +18,7 @@ class taskModel(tsMixin,Model):
 
 class dataFormat(Model):
     __bind_key__ = None
-    __tableName__ = "fg_data_format"
+    __tablename__ = "fg_data_format"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(150))
     remark = db.Column(db.Text(), nullable=True)
@@ -28,7 +28,7 @@ class dataFormat(Model):
 
 class hyperParam(tsMixin,Model):
     __bind_key__ = None
-    __tableName__ = "fg_hyper_param"
+    __tablename__ = "fg_hyper_param"
     id = db.Column(db.Integer, primary_key=True)
     slug = db.Column(db.String(150))
     task_id = db.Column(db.Integer, db.ForeignKey(taskModel.id))
@@ -55,7 +55,7 @@ class weightModel(tsMixin,Model):
     task = db.relationship(taskModel)
 
 class hyperParamWeight(tsMixin,Model):
-    __tablename__ = "fg_ph_weight"
+    __tablename__ = "fg_hp_weight"
     id = db.Column(db.Integer, primary_key=True)
     hp_id = db.Column(db.Integer, db.ForeignKey(hyperParam.id))
     hyperparam = db.relationship(hyperParam, foreign_keys = [hp_id], backref="weights")
@@ -66,4 +66,4 @@ class hyperParamWeight(tsMixin,Model):
     def __repr(self):
         return str(self.weight.name)+"|"+str(self.hyperparam.slug)
 
-weightModel.involved_hp = db.relationship(hyperParam, secondary = "fg_ph_weight")
+weightModel.involved_hp = db.relationship(hyperParam, secondary = "fg_hp_weight")
