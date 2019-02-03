@@ -31,8 +31,17 @@ class weightView(ModelView):
     route_base = "/weight"
     datamodel = SQLAInterface(models.weightModel)
 
-    list_columns = ["id","task","name","path","framewk","param_json","remark","created_at","updated_at"]
+    label_columns = {"name":"Model Name","framewk":"Framework","path":"path_saved"}
+
+    add_columns = ["task","name","path","framewk","params_json","remark"]
+    edit_columns = ["task","name","path","framewk","params_json","remark"]
+    list_columns = ["id","task","name","path","framewk","params_json","remark","created_at","updated_at"]
+    show_columns = ["id","task","name","path","framewk","params_json","remark","created_at","updated_at"]
 
 class hyperParamWeightView(ModelView):
     route_base = "/hpweight"
     datamodel = SQLAInterface(models.hyperParamWeight)
+
+    add_columns = ["hyperparam","weight"]
+    list_columns = ["hyperparam","weight","valsnap","created_at","updated_at"]
+    show_columns = ["id","hyperparam","weight","valsnap","created_at","updated_at"]

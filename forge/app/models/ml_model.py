@@ -54,6 +54,9 @@ class weightModel(tsMixin,Model):
 
     task = db.relationship(taskModel)
 
+    def __repr__(self):
+        return self.name
+
 class hyperParamWeight(tsMixin,Model):
     __tablename__ = "fg_hp_weight"
     id = db.Column(db.Integer, primary_key=True)
@@ -63,7 +66,7 @@ class hyperParamWeight(tsMixin,Model):
     weight = db.relationship(weightModel, foreign_keys = [weight_id], backref = "hyper_params")
     valsnap = db.Column(db.String(255), nullable = True) # snapshot of hyper param value
 
-    def __repr(self):
+    def __repr__(self):
         return str(self.weight.name)+"|"+str(self.hyperparam.slug)
 
 weightModel.involved_hp = db.relationship(hyperParam, secondary = "fg_hp_weight")
