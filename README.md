@@ -15,6 +15,13 @@ Forge is originally created to organize the above chaos with minimal extra codin
 
 Hopefully, this tracking mechanism will evolve to a way offering clearer sense of managing your AI/Learning tasks.
 
+### Installation
+
+This framework demands ```python3.6``` or above, preferably anaconda3, to use python api, install the package under the same environment you train your model.
+
+Run the following under the proper environment
+```(base)$ pip install git+https://github.com/raynardj/forge```
+
 ### The Web UI
 
 Forge offers a [Web UI solution](forge/README.md) for administrative cleaning up your AI tasks.
@@ -22,5 +29,6 @@ Forge offers a [Web UI solution](forge/README.md) for administrative cleaning up
 
 ### Python code API
 
-```forgebox``` is a [python api](forgebox/README.md) that you can add to your python script or jupyter notebook cell. You can train your model happily in the way you like, with very limited addition to your original code. And read/check/review your training trial on a clean shaved Web interface.
+```forgebox``` is a [python api](forgebox/README.md) that you can add to your python script or jupyter notebook cell. You can train your model happily in the way you like, with very limited addition to your original code.
+Then your training trial can be read/checked/reviewed on a clean shaved Web interface.
 
