@@ -2,19 +2,31 @@ from . import db
 from .. import security_manager
 from . import tsMixin
 from flask_appbuilder import Model
+from sqlalchemy.ext.declarative import declared_attr
 
 class taskModel(tsMixin,Model):
     __bind_key__ = None
     __tablename__ = "fg_task"
     id = db.Column(db.Integer, primary_key=True)
     taskname = db.Column(db.String(150))
-    owner_id = db.Column(db.Integer(), db.ForeignKey("ab_user.id"), nullable=True)
     remark = db.Column(db.Text(),nullable = True)
 
-    owner = db.relationship(security_manager.user_model, foreign_keys=[owner_id])
+    @declared_attr
+    def owner_id(self):
+        return db.Column(db.Integer, db.ForeignKey("ab_user.id"),
+                         default=self.get_user_id, nullable=True)
+
+    @classmethod
+    def get_user_id(cls):
+        try:
+            return g.user.id
+        except Exception as e:
+            return None
+
+    owner = db.relationship(security_manager.user_model)
 
     def __repr__(self):
-        return "%s:%s"%(self.taskname, self.owner.username)
+        return self.taskname
 
 class dataFormat(Model):
     __bind_key__ = None
