@@ -2,10 +2,21 @@ from .dbcore import session, taskModel, hyperParam, dataFormat
 from datetime import datetime
 
 class forgedb(object):
-    def __init__(self, task):
+    def __init__(self, task, remark = "created_in_code"):
+        """
+        connect to a task, will create a new task if not already established
+        :param task: task name string
+        :param remark: Introduction about this task
+        """
         super(forgedb,self).__init__()
         self.s = session
         self.task = self.s.query(taskModel).filter(taskModel.taskname == task).first()
+        if self.task ==None:
+            taskitem = taskModel(taskname = task,remark = remark)
+            self.s.add(taskitem)
+            self.s.flush()
+            self.s.commit()
+            self.task = taskitem
         self.hp2dict()
         print("="*10+"hyper params"+"="*10)
         print(self.confdict)
