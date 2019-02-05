@@ -7,7 +7,7 @@ class taskView(ModelView):
     route_base = "/task"
     datamodel = SQLAInterface(models.taskModel)
 
-    label_columns = {"taskname":"Task","owner":"Owner","remark":"Remark"}
+    label_columns = {"taskname":"Task","owner":"Owner","remark":"Remark","created_at":"Create","updated_at":"Update"}
     list_title = "Machine Learning Tasks"
     show_title = "Machine Learning Task"
     edit_title = "Machine Learning Task"
@@ -33,7 +33,7 @@ class hyperParamView(ModelView):
     show_title = "Hyper Parameter"
     edit_title = "Hyper Parameter"
     add_title = "Hyper Parameter"
-    label_columns = {"slug":"Name","val":"Value","format":"Type"}
+    label_columns = {"slug":"Name","val":"Value","format":"Type","created_at":"Create","updated_at":"Update"}
     add_columns = ["task", "format", "slug", "val", "remark"]
     edit_columns = ["task","format","slug","val","remark"]
     list_columns = ["task","format","slug","val","remark","created_at","updated_at"]
@@ -42,7 +42,7 @@ class weightView(ModelView):
     route_base = "/weight"
     datamodel = SQLAInterface(models.weightModel)
 
-    label_columns = {"name":"Model Name","framewk":"Framework","path":"path_saved"}
+    label_columns = {"name":"Model Name","framewk":"Framework","path":"path_saved","created_at":"Create","updated_at":"Update"}
 
     list_title = "Model Weights"
     add_title = "Model Weights"
@@ -57,6 +57,10 @@ class hyperParamWeightView(ModelView):
     route_base = "/hpweight"
     datamodel = SQLAInterface(models.hyperParamWeight)
 
+    list_title = "H Param for Model Weights"
+    add_title = "H Param for Model Weights"
+    edit_title = "H Param for Model Weights"
+    show_title = "H Param for Model Weights"
     add_columns = ["hyperparam","weight"]
     list_columns = ["hyperparam","weight","valsnap","created_at","updated_at"]
     show_columns = ["id","hyperparam","weight","valsnap","created_at","updated_at"]
