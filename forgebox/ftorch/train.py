@@ -1,29 +1,14 @@
-from .apicore import forgedb
-from .config import DATADIR
-from tqdm import trange
-import torch
 import os
 from datetime import datetime
+import __main__ as main
 from torch.utils.data import DataLoader
+from tqdm import trange
 from functools import reduce
 import pandas as pd
-
-import __main__ as main
 
 JUPYTER = True if main.get_ipython else False
 
 if JUPYTER:from tqdm import tqdm_notebook as tn
-
-class FG(forgedb):
-    def __init__(self,*args, **kwargs):
-        super(FG,self).__init__(*args,**kwargs)
-
-    def save_weights(self,model, modelname = None):
-        weightname = "%s_torch_%s.npy"%(self.modelnow,str(int(datetime.now().timestamp()*100)))
-        path = os.path.join(self.taskdir, weightname)
-        torch.save(model.state_dict(), path)
-        w = self.log_weights(path, framewk="pytorch")
-        return w
 
 class Trainer:
     def __init__(self, dataset, val_dataset=None, batch_size=16,
