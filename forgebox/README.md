@@ -31,4 +31,3 @@ Set a new hyper param, like, 3 epochs for training
 ```python
 epochs = p("nb_epochs",3)
 ```
-TODO move ray to here

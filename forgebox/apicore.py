@@ -29,6 +29,9 @@ class forgedb(object):
         self.set_hp_attributes()
         self.modelnow = self.new_model_name()
 
+    def __repr__(self):
+        return "[forge:%s]"%(self.task.taskname)
+
     def get_hyperparams(self):
         """
         from task to hyper parameters
