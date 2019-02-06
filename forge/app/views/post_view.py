@@ -1,12 +1,11 @@
-from .. import models
+from ..models import postModel
 from flask_appbuilder.models.sqla.interface import SQLAInterface
-from flask_appbuilder.security.decorators import has_access
 from flask_appbuilder import expose,BaseView,ModelView
 
 
 class PostView(ModelView):
     route_base = "/post"
-    datamodel = SQLAInterface(models.postModel)
+    datamodel = SQLAInterface(postModel)
     label_columns = {
         "user":"User","head_big":"Title","head_small":"SubTitle","content":"Content",
         "content.brief_ctt":"Brief Content","created_at":"Created","updated_at":"Updated",

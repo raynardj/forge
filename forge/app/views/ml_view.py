@@ -1,11 +1,11 @@
-from .. import models
+from ..models import taskModel,dataFormat,hyperParam,hyperParamWeight,weightModel
 from flask_appbuilder.models.sqla.interface import SQLAInterface
 from flask_appbuilder.security.decorators import has_access
 from flask_appbuilder import expose,BaseView,ModelView
 
 class taskView(ModelView):
     route_base = "/task"
-    datamodel = SQLAInterface(models.taskModel)
+    datamodel = SQLAInterface(taskModel)
 
     label_columns = {"taskname":"Task","owner":"Owner","remark":"Remark","created_at":"Create","updated_at":"Update"}
     list_title = "Machine Learning Tasks"
@@ -19,7 +19,7 @@ class taskView(ModelView):
 
 class formatView(ModelView):
     route_base = "/format"
-    datamodel = SQLAInterface(models.dataFormat)
+    datamodel = SQLAInterface(dataFormat)
 
     label_columns = {"name":"Object Type","remark":"Remark"}
     list_columns = ["id","name","remark"]
@@ -27,7 +27,7 @@ class formatView(ModelView):
 
 class hyperParamView(ModelView):
     route_base = "/hp"
-    datamodel = SQLAInterface(models.hyperParam)
+    datamodel = SQLAInterface(hyperParam)
 
     list_title = "Hyper Parameters"
     show_title = "Hyper Parameter"
@@ -40,7 +40,7 @@ class hyperParamView(ModelView):
 
 class weightView(ModelView):
     route_base = "/weight"
-    datamodel = SQLAInterface(models.weightModel)
+    datamodel = SQLAInterface(weightModel)
 
     label_columns = {"name":"Model Name","framewk":"Framework","path":"path_saved","created_at":"Create","updated_at":"Update"}
 
@@ -55,7 +55,7 @@ class weightView(ModelView):
 
 class hyperParamWeightView(ModelView):
     route_base = "/hpweight"
-    datamodel = SQLAInterface(models.hyperParamWeight)
+    datamodel = SQLAInterface(hyperParamWeight)
 
     list_title = "H Param for Model Weights"
     add_title = "H Param for Model Weights"
