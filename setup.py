@@ -9,4 +9,8 @@ setup(
     description="Ray's tool for managing machine learning",
     packages = find_packages(),
     py_modules=['forgebox','forge',],
+    install_requires = [
+        "pandas>=0.18.0",
+        "tqdm>=4.25.0",
+    ],
 )
