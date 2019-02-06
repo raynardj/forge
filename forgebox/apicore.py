@@ -1,8 +1,11 @@
-from .dbcore import session, taskModel, hyperParam, dataFormat
+from .dbcore import session, taskModel, weightModel, hyperParam, hyperParamWeight, dataFormat
 from datetime import datetime
+import json,os
+from .utils import create_dir
+from .config import DATADIR
 
 class forgedb(object):
-    def __init__(self, task, remark = "created_in_code"):
+    def __init__(self, task, remark = "created_in_code", framewk = "pytorch"):
         """
         connect to a task, will create a new task if not already established
         :param task: task name string
@@ -17,10 +20,14 @@ class forgedb(object):
             self.s.flush()
             self.s.commit()
             self.task = taskitem
+        self.taskdir = os.path.join(DATADIR,self.task.taskname)
+        create_dir(self.taskdir)
         self.hp2dict()
         print("="*10+"hyper params"+"="*10)
         print(self.confdict)
+        self.framewk = framewk
         self.set_hp_attributes()
+        self.modelnow = self.new_model_name()
 
     def get_hyperparams(self):
         """
@@ -29,10 +36,14 @@ class forgedb(object):
         """
         return self.s.query(hyperParam).filter(hyperParam.task_id == self.task.id).all()
 
-    def hp2dict(self):
+    def hp2dict(self,):
+        """
+
+        :return: hplist, hpdict
+        """
         hplist = self.get_hyperparams()
         self.confdict = dict((hp.slug, eval(hp.format.name)(hp.val)) for hp in hplist)
-        return self.confdict
+        return hplist,self.confdict
 
     def set_hp_attributes(self):
         list(setattr(self,hpslug,hpval) for hpslug,hpval in self.confdict.items())
@@ -71,3 +82,29 @@ class forgedb(object):
             hp = self.s.query(hyperParam).filter(hyperParam.slug == key, hyperParam.task_id == self.task.id).first()
             if hp:
                 return eval(hp.format.name)(hp.val)
+
+    def new_model_name(self,extra_name = "model"):
+        """
+        :param extra_name: optional, default model, describe this in 1 consequtive string, something like model structure
+        :return: a model name
+        """
+        self.modelnow = "%s_%s"%(self.task.taskname,extra_name)
+        return self.modelnow
+
+    def log_weights(self,path, modelname=None, framewk = None):
+        hplist, hpdict = self.hp2dict()
+        if framewk:
+            self.framewk = framewk
+        mn = modelname if modelname else self.modelnow
+        w = weightModel(task_id = self.task.id, name = mn,
+                        path = path, framewk = self.framewk,
+                        params_json = json.dumps(hpdict),
+                        created_at = datetime.now(), updated_at = datetime.now(),
+                        )
+        self.s.add(w)
+        self.s.flush()
+        self.s.commit()
+        wlist = (hyperParamWeight(hp_id = hp.id,weight_id = w.id, valsnap = hp.val) for hp in hplist)
+        self.s.add_all(wlist)
+        self.s.commit()
+        return w

@@ -81,4 +81,19 @@ class hyperParamWeight(tsMixin,Model):
     def __repr__(self):
         return str(self.weight.name)+"|"+str(self.hyperparam.slug)
 
+class mapModel(tsMixin,Model):
+    __tablename__ = "fg_map"
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255))
+    cola = db.Column(db.String(255),nullable = True)
+    cola_fid = db.Column(db.Integer, db.ForeignKey(dataFormat.id))
+    colb = db.Column(db.String(255),nullable = True)
+    colb_fid = db.Column(db.Integer, db.ForeignKey(dataFormat.id))
+    kv = db.Column(db.Text)
+    remark = db.Column(db.Text(), nullable=True)
+
+    cola_form = db.relationship(dataFormat, foreign_keys = [cola_fid])
+    colb_form = db.relationship(dataFormat, foreign_keys = [colb_fid])
+
+
 weightModel.involved_hp = db.relationship(hyperParam, secondary = "fg_hp_weight")
