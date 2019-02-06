@@ -97,3 +97,33 @@ class mapModel(tsMixin,Model):
 
 
 weightModel.involved_hp = db.relationship(hyperParam, secondary = "fg_hp_weight")
+
+class metricModel(tsMixin,Model):
+    __tablename__ = "fg_metric"
+    id = db.Column(db.Integer, primary_key=True)
+    slug = db.Column(db.String(150))
+    task_id = db.Column(db.Integer, db.ForeignKey(taskModel.id))
+    format_id = db.Column(db.Integer, db.ForeignKey(dataFormat.id))
+    val = db.Column(db.String(255), nullable=True)
+    big_better = db.Column(db.Boolean, default = True)
+    bestyet_id = db.Column(db.Integer,db.ForeignKey(weightModel.id))
+    remark = db.Column(db.Text(), nullable=True)
+
+    task = db.relationship(taskModel)
+    format = db.relationship(dataFormat)
+    bestyet = db.relationship(weightModel, foreign_keys = [bestyet_id])
+
+    def __repr__(self):
+        return self.slug
+
+class metricWeight(tsMixin,Model):
+    __tablename__ = "fg_metric_weight"
+    id = db.Column(db.Integer, primary_key=True)
+    metric_id = db.Column(db.Integer, db.ForeignKey(metricModel.id))
+    metric = db.relationship(metricModel, foreign_keys=[metric_id], backref="weights")
+    weight_id = db.Column(db.Integer, db.ForeignKey(weightModel.id))
+    weight = db.relationship(weightModel, foreign_keys=[weight_id], backref="metrics")
+    valsnap = db.Column(db.String(255), nullable=True)  # snapshot of hyper param value
+
+    def __repr__(self):
+        return str(self.weight.name) + "|" + str(self.metric.slug)
