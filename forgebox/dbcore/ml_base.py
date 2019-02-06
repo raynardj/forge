@@ -2,12 +2,14 @@ from . import Base
 from sqlalchemy import Column,DateTime
 from datetime import datetime
 from sqlalchemy.orm import relationship
+from sqlalchemy.ext.declarative import declarative_base, declared_attr
 
 taskModel = Base.classes.fg_task
 dataFormat = Base.classes.fg_data_format
 hyperParam = Base.classes.fg_hyper_param
 weightModel = Base.classes.fg_weight
 hyperParamWeight = Base.classes.fg_hp_weight
+mapModel = Base.classes.fg_map
 
 taskModel.__doc__ = """
 Machine Learnin Tasks
@@ -31,5 +33,7 @@ columns from tsMixin:
 created_at
 updated_at
 """
+taskModel.__repr__ = lambda self:self.taskname
+dataFormat.__repr__ = lambda self:self.name
 
 hyperParam.format = relationship(dataFormat)
