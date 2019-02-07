@@ -25,7 +25,8 @@ def page_not_found(e):
     return render_template('404.html', base_template=appbuilder.base_template, appbuilder=appbuilder), 404
 
 from .post_view import PostView
-from .ml_view import taskView,formatView,hyperParamView,weightView,hyperParamWeightView
+from .ml_view import taskView, formatView, hyperParamView, weightView, hyperParamWeightView, metricView, \
+    metricWeightView
 
 web_cate = {"category":"Web", "category_icon":"fa-dashboard"}
 appbuilder.add_view(PostView, "posts", icon="fa-book", **web_cate )
@@ -35,6 +36,9 @@ appbuilder.add_view(taskView, "Tasks", icon="fa-tasks", **ml_cate )
 appbuilder.add_view(formatView, "Config Formats", icon="fa-star-half-o", **ml_cate )
 appbuilder.add_view(hyperParamView, "Hyper Parameters", icon="fa-flask", **ml_cate )
 appbuilder.add_view(weightView, "Model Weights", icon="fa-cubes", **ml_cate )
+appbuilder.add_separator(category=ml_cate["category"])
+appbuilder.add_view(metricView, "Metrics", icon="fa-star-half-o", **ml_cate )
+appbuilder.add_view(metricWeightView, "Metric Log", icon="fa-line-chart", **ml_cate )
 
 db.create_all()
 
