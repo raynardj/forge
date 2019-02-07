@@ -18,7 +18,9 @@ Hopefully, this tracking mechanism will evolve to a way offering clearer sense o
 This framework demands ```python3.6``` or above, preferably anaconda3, to use python api, install the package under the same environment you train your model.
 
 Run the following under the proper environment
-```(base)$ pip install git+https://github.com/raynardj/forge```
+```
+(base)$ pip install git+https://github.com/raynardj/forge
+```
 
 ### The Web UI
 
