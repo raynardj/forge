@@ -1,36 +1,44 @@
-from .dbcore import session, taskModel, weightModel, hyperParam, hyperParamWeight, dataFormat
+from .dbcore import session, taskModel, weightModel, hyperParam, hyperParamWeight, dataFormat, metricModel, metricWeight
 from datetime import datetime
-import json,os
+import json, os
 from .utils import create_dir
 from .config import DATADIR
 
+# todo a metric class handling the metric variable
+class metric(object):
+    def __init__(self, metric_slug, task_id):
+        super(metric,self).__init__()
+        self.s = session
+        self.task = self.s.query(taskModel).filter(taskModel.id == task_id).first()
+        pass
+
 class forgedb(object):
-    def __init__(self, task, remark = "created_in_code", framewk = "pytorch"):
+    def __init__(self, task, remark="created_in_code", framewk="pytorch"):
         """
         connect to a task, will create a new task if not already established
         :param task: task name string
         :param remark: Introduction about this task
         """
-        super(forgedb,self).__init__()
+        super(forgedb, self).__init__()
         self.s = session
         self.task = self.s.query(taskModel).filter(taskModel.taskname == task).first()
-        if self.task ==None:
-            taskitem = taskModel(taskname = task,remark = remark)
+        if self.task == None:
+            taskitem = taskModel(taskname=task, remark=remark)
             self.s.add(taskitem)
             self.s.flush()
             self.s.commit()
             self.task = taskitem
-        self.taskdir = os.path.join(DATADIR,self.task.taskname)
+        self.taskdir = os.path.join(DATADIR, self.task.taskname)
         create_dir(self.taskdir)
         self.hp2dict()
-        print("="*10+"hyper params"+"="*10)
+        print("=" * 10 + "hyper params" + "=" * 10)
         print(self.confdict)
         self.framewk = framewk
         self.set_hp_attributes()
         self.modelnow = self.new_model_name()
 
     def __repr__(self):
-        return "[forge:%s]"%(self.task.taskname)
+        return "[forge:%s]" % (self.task.taskname)
 
     def get_hyperparams(self):
         """
@@ -39,17 +47,17 @@ class forgedb(object):
         """
         return self.s.query(hyperParam).filter(hyperParam.task_id == self.task.id).all()
 
-    def hp2dict(self,):
+    def hp2dict(self, ):
         """
 
         :return: hplist, hpdict
         """
         hplist = self.get_hyperparams()
         self.confdict = dict((hp.slug, eval(hp.format.name)(hp.val)) for hp in hplist)
-        return hplist,self.confdict
+        return hplist, self.confdict
 
     def set_hp_attributes(self):
-        list(setattr(self,hpslug,hpval) for hpslug,hpval in self.confdict.items())
+        list(setattr(self, hpslug, hpval) for hpslug, hpval in self.confdict.items())
 
     def p(self, key, val=None):
         """
@@ -70,14 +78,14 @@ class forgedb(object):
                 return eval(hp.format.name)(hp.val)
             else:
                 fmt = self.s.query(dataFormat).filter(dataFormat.name == type(val).__name__).first()
-                if fmt ==None:
-                    assert False, "No such format set yet: %s"%(type(val))
-                hp = hyperParam(task_id = self.task.id,
-                                slug = key,
-                                remark = "Created in task %s"%(self.task.taskname),
-                                format_id = fmt.id,
-                                created_at = datetime.now(),
-                                updated_at = datetime.now(), val = str(val))
+                if fmt == None:
+                    assert False, "No such format set yet: %s" % (type(val))
+                hp = hyperParam(task_id=self.task.id,
+                                slug=key,
+                                remark="Created in task %s" % (self.task.taskname),
+                                format_id=fmt.id,
+                                created_at=datetime.now(),
+                                updated_at=datetime.now(), val=str(val))
                 self.s.add(hp)
                 self.s.commit()
                 return eval(hp.format.name)(hp.val)
@@ -86,28 +94,41 @@ class forgedb(object):
             if hp:
                 return eval(hp.format.name)(hp.val)
 
-    def new_model_name(self,extra_name = "model"):
+    def new_model_name(self, extra_name="model"):
         """
         :param extra_name: optional, default model, describe this in 1 consequtive string, something like model structure
         :return: a model name
         """
-        self.modelnow = "%s_%s"%(self.task.taskname,extra_name)
+        self.modelnow = "%s_%s" % (self.task.taskname, extra_name)
         return self.modelnow
 
-    def log_weights(self,path, modelname=None, framewk = None):
+    def log_weights(self, path, modelname=None, framewk=None):
         hplist, hpdict = self.hp2dict()
         if framewk:
             self.framewk = framewk
         mn = modelname if modelname else self.modelnow
-        w = weightModel(task_id = self.task.id, name = mn,
-                        path = path, framewk = self.framewk,
-                        params_json = json.dumps(hpdict),
-                        created_at = datetime.now(), updated_at = datetime.now(),
+        w = weightModel(task_id=self.task.id, name=mn,
+                        path=path, framewk=self.framewk,
+                        params_json=json.dumps(hpdict),
+                        created_at=datetime.now(), updated_at=datetime.now(),
                         )
         self.s.add(w)
         self.s.flush()
         self.s.commit()
-        wlist = (hyperParamWeight(hp_id = hp.id,weight_id = w.id, valsnap = hp.val) for hp in hplist)
+        wlist = (hyperParamWeight(hp_id=hp.id, weight_id=w.id, valsnap=hp.val) for hp in hplist)
         self.s.add_all(wlist)
         self.s.commit()
         return w
+
+    def m(self, key, val): # todo replace this with a function to digest metric variable
+        """
+        recording the metrics
+        key: metric name
+        """
+        val = str(val)
+        mt = self.s.query(metricModel).filter(metricModel.slug == key, metricModel.task_id == self.task.id).first()
+        if mt:
+            mt.val = val
+            self.s.add(mt)
+            self.s.commit()
+        return val
