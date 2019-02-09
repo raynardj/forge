@@ -6,12 +6,13 @@ Like cooking, after you've done some machine learning experiment in your jupyter
 
 See [selling points](#selling-points)
 
-
 ### Purpose of Forge:
 
 Forge is originally created to organize the above chaos with minimal extra coding, and parallel access through WebUI/python.
 
 Hopefully, this tracking mechanism will evolve to a way offering clearer sense of managing your AI/Learning tasks.
+
+![task management example](img/intro_001.png)
 
 ### Installation
 
