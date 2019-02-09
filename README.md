@@ -26,6 +26,7 @@ Run the following under the proper environment
 ### The Web UI
 
 Forge offers a [Web UI solution](forge/README.md) for administrative purpose, cleaning up your AI tasks.
+![weight management page](intro_002.png)
 
 
 ### Python code API
