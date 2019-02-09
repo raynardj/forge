@@ -1,4 +1,4 @@
-# The pytorch core for mananging AI tasks
+# The coding add-on for mananging AI tasks
 
 ## This module should run independently from forge web UI
 
@@ -96,4 +96,10 @@ def val_action(*args,**kwargs)
     y = y.float()
     y_ = model(x)
     ...
+```
+
+Then run the training for 3 epochs like:
+
+```python
+trainer.train(3)
 ```
