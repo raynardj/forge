@@ -123,7 +123,7 @@ class forgedb(object):
                         created_at=datetime.now(), updated_at=datetime.now(),
                         )
         self.s.add(w)
-        self.s.flush()
+        # self.s.flush()
         self.s.commit()
         wlist = (hyperParamWeight(hp_id=hp.id, weight_id=w.id, valsnap=hp.val) for hp in hplist)
         self.s.add_all(wlist)
@@ -134,6 +134,7 @@ class forgedb(object):
         """
         recording the metrics
         key: metric name
+        val: metric value
         """
         val = str(val)
         mt = self.s.query(metricModel).filter(metricModel.slug == key, metricModel.task_id == self.task.id).first()
@@ -147,6 +148,6 @@ class forgedb(object):
                              val = str(val),
                              big_better = big_better,
                              remark = remark)
-            self.s.add(mt)
-            self.s.commit()
-        return val
+        self.s.add(mt)
+        self.s.commit()
+        return mt
