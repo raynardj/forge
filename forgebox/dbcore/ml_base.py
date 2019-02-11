@@ -1,8 +1,6 @@
-from . import Base
+from . import Base,session
 from sqlalchemy import Column,DateTime
-from datetime import datetime
 from sqlalchemy.orm import relationship
-from sqlalchemy.ext.declarative import declarative_base, declared_attr
 
 taskModel = Base.classes.fg_task
 dataFormat = Base.classes.fg_data_format
@@ -10,6 +8,8 @@ hyperParam = Base.classes.fg_hyper_param
 weightModel = Base.classes.fg_weight
 hyperParamWeight = Base.classes.fg_hp_weight
 mapModel = Base.classes.fg_map
+metricModel = Base.classes.fg_metric
+metricWeight = Base.classes.fg_metric_weight
 
 taskModel.__doc__ = """
 Machine Learnin Tasks
@@ -37,3 +37,17 @@ taskModel.__repr__ = lambda self:self.taskname
 dataFormat.__repr__ = lambda self:self.name
 
 hyperParam.format = relationship(dataFormat)
+
+
+def add_metric(self,metric):
+    """
+    :param metric: A metricModel object
+    :return: A metricWeight object, logging the  metric
+    """
+    metriclog = metricWeight(weight_id = self.id, metric_id = metric.id, valsnap = str(metric.val))
+    session.add(metriclog)
+    session.flush()
+    session.commit()
+    return metriclog
+
+weightModel.add_metric = add_metric
