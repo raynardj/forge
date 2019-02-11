@@ -106,7 +106,7 @@ class metricModel(tsMixin,Model):
     format_id = db.Column(db.Integer, db.ForeignKey(dataFormat.id))
     val = db.Column(db.String(255), nullable=True)
     big_better = db.Column(db.Boolean, default = True)
-    bestyet_id = db.Column(db.Integer,db.ForeignKey(weightModel.id))
+    bestyet_id = db.Column(db.Integer,db.ForeignKey(weightModel.id), nullable = True)
     remark = db.Column(db.Text(), nullable=True)
 
     task = db.relationship(taskModel)
