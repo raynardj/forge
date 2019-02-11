@@ -4,13 +4,13 @@ import json, os
 from .utils import create_dir
 from .config import DATADIR
 
-# todo a metric class handling the metric variable
-class metric(object):
-    def __init__(self, metric_slug, task_id):
-        super(metric,self).__init__()
-        self.s = session
-        self.task = self.s.query(taskModel).filter(taskModel.id == task_id).first()
-        self.metric = self.s.query(metricModel).fitler(metricModel.slug == metric_slug).first()
+# todo decide whether should I need an independent metric object
+# class metric(object):
+#     def __init__(self, metric_slug, task_id):
+#         super(metric,self).__init__()
+#         self.s = session
+#         self.task = self.s.query(taskModel).filter(taskModel.id == task_id).first()
+#         self.metric = self.s.query(metricModel).fitler(metricModel.slug == metric_slug).first()
 
 class forgedb(object):
     def __init__(self, task, remark="created_in_code", framewk="pytorch"):
@@ -130,7 +130,7 @@ class forgedb(object):
         self.s.commit()
         return w
 
-    def m(self, key, val, big_better = True, remark = "setting from m()"): # todo replace this with a function to digest metric variable
+    def m(self, key, val, big_better = True, remark = "setting from m()"):
         """
         recording the metrics
         key: metric name
