@@ -130,11 +130,14 @@ class forgedb(object):
         self.s.commit()
         return w
 
-    def m(self, key, val, big_better = True, remark = "setting from m()"):
+    def m(self, key, val, big_better = True,
+          remark = "setting from m()",
+          weight = None):
         """
         recording the metrics
         key: metric name
         val: metric value
+        weight: weight object, if None, using the latest weight in task
         """
         val = str(val)
         mt = self.s.query(metricModel).filter(metricModel.slug == key, metricModel.task_id == self.task.id).first()
@@ -150,4 +153,8 @@ class forgedb(object):
                              remark = remark)
         self.s.add(mt)
         self.s.commit()
+        if weight:
+            mw = metricWeight(metric_id = mt.id, weight_id = weightModel, valsnap = str(val))
+            self.s.add(mw)
+            self.s.commit()
         return mt
