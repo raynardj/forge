@@ -11,6 +11,6 @@ engine = create_engine(SQLALCHEMY_DATABASE_URI)
 
 Base.prepare(engine, reflect = True)
 
-from .ml_base import taskModel,dataFormat,hyperParam,hyperParamWeight,weightModel,metricModel,metricWeight
-
 session = Session(engine)
+
+from .ml_base import taskModel, dataFormat, hyperParam, hyperParamWeight, weightModel, metricModel, metricWeight
