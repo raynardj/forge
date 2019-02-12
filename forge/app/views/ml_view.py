@@ -76,7 +76,7 @@ class metricView(ModelView):
     list_title = "Metrics"
     show_columns = "Metrics"
 
-    label_columns = {"bestyet":"Best so far"}
+    label_columns = {"bestyet":"Best so far", "val":"Value"}
 
     add_columns = ["slug", "task", "format", "val", "big_better", "remark", "weights", "bestyet"]
     edit_columns = ["slug", "task", "format", "val", "big_better", "remark", "weights", "bestyet"]
