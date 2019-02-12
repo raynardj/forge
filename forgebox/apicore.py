@@ -13,7 +13,7 @@ from .config import DATADIR
 #         self.metric = self.s.query(metricModel).fitler(metricModel.slug == metric_slug).first()
 
 class forgedb(object):
-    def __init__(self, task, remark="created_in_code", framewk="pytorch"):
+    def __init__(self, task, remark="created_in_code", framewk="pytorch", verbose = True):
         """
         connect to a task, will create a new task if not already established
         :param task: task name string
@@ -22,7 +22,9 @@ class forgedb(object):
         super(forgedb, self).__init__()
         self.s = session
         self.task = self.s.query(taskModel).filter(taskModel.taskname == task).first()
+        self.verbose = verbose
         if self.task == None:
+            if self.verbose:print("[creating task:%s]"%(task))
             taskitem = taskModel(taskname=task, remark=remark)
             self.s.add(taskitem)
             self.s.flush()
@@ -31,8 +33,9 @@ class forgedb(object):
         self.taskdir = os.path.join(DATADIR, self.task.taskname)
         create_dir(self.taskdir)
         self.hp2dict()
-        print("=" * 10 + "hyper params" + "=" * 10)
-        print(self.confdict)
+        if self.verbose:
+            print("=" * 10 + "hyper params" + "=" * 10)
+            print(self.confdict)
         self.framewk = framewk
         self.set_hp_attributes()
         self.modelnow = self.new_model_name()
@@ -131,7 +134,7 @@ class forgedb(object):
         return w
 
     def m(self, key, val, big_better = True,
-          remark = "setting from m()",
+          remark = None,
           weight = None):
         """
         recording the metrics
@@ -141,6 +144,8 @@ class forgedb(object):
         """
         val = str(val)
         mt = self.s.query(metricModel).filter(metricModel.slug == key, metricModel.task_id == self.task.id).first()
+        if remark == None:
+            remark = "creating from task:%s"%(self.task.taskname)
         if mt:
             mt.val = val
         else:
@@ -158,3 +163,16 @@ class forgedb(object):
             self.s.add(mw)
             self.s.commit()
         return mt
+
+    def save_metrics(self,metrics,small_list = None, weight = None):
+        """
+
+        :param metrics: dictionary
+        :return:
+        """
+        if small_list ==None: small_list = []
+        for k, v in metrics.items():
+            kwa = dict({"key":k,"val":v,"weight":weight})
+            if k in small_list:
+                kwa.update({"big_better":False})
+            self.m(**kwa)
