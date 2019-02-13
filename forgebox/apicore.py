@@ -166,7 +166,7 @@ class forgedb(object):
 
     def save_metrics(self,metrics,small_list = None, weight = None):
         """
-
+        saving a dictionary of metrics
         :param metrics: dictionary
         :return:
         """
