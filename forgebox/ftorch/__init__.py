@@ -13,3 +13,15 @@ class FG(forgedb):
         torch.save(model.state_dict(), path)
         w = self.log_weights(path, framewk="pytorch")
         return w
+
+    def metrics(self,f):
+        """
+        A decorator saving the metrics
+        :param f:
+        :return:
+        """
+        def wraper(*args,**kwargs):
+            metric_dict = f(*args,**kwargs)
+            self.save_metrics(metrics = metric_dict,) #todo put in weight & small_list parameter
+            return metric_dict
+        return wraper
