@@ -32,4 +32,4 @@ Set a new hyper param, like, 3 epochs for training
 epochs = p("nb_epochs",3)
 ```
 ## PyTorch Integration
-For pytorch users, Forge is intergrated into the training framework. Check [ftorch](forgebox/ftorch) for detail
+For pytorch users, Forge is intergrated into the training framework. Check [ftorch](ftorch) for detail
