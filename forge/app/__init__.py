@@ -3,6 +3,7 @@ from flask import Flask
 from flask_appbuilder import SQLA, AppBuilder
 from .security import MySecurityManager as SecurityManager
 from .utils import create_dir
+from forge import config
 
 """
  Logging configuration
@@ -12,7 +13,7 @@ logging.basicConfig(format='%(asctime)s:%(levelname)s:%(name)s:%(message)s')
 logging.getLogger().setLevel(logging.DEBUG)
 
 app = Flask(__name__)
-app.config.from_object('config')
+app.config.from_object(config)
 create_dir(app.config.get("DATADIR"))
 db = SQLA(app)
 appbuilder = AppBuilder(app, db.session, security_manager_class=SecurityManager)
