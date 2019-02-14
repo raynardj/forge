@@ -1,0 +1,2 @@
+recursive-include forge/app/templates *
+recursive-include forge/app/static *
