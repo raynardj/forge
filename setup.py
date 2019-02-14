@@ -8,8 +8,10 @@ setup(
     author_email="raynard@rasenn.com",
     description="Ray's tool for managing machine learning",
     packages = find_packages(),
-    py_modules=['forgebox','forge',],
+    py_modules=['forgebox','./forge/*'],
     install_requires = [
+        "flask==0.12.4",
+        "flask_appbuilder==1.10.0",
         "pandas>=0.18.0",
         "tqdm>=4.25.0",
     ],
