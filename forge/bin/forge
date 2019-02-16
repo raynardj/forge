@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 
 from forge.app import app
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("--port", default=5017, type=int, help="Port number")
+args = parser.parse_args()
+port = int(args.port)
 
-app.run(host='0.0.0.0', port=5017, debug=True)
+app.run(host='0.0.0.0', port=port, debug=True)
