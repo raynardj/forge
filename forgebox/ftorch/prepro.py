@@ -5,6 +5,22 @@ import pandas as pd
 import numpy as np
 from collections import Counter
 
+
+class Empty(Dataset):
+    def __init__(self, length):
+        """
+        empety dataset, spit out random number
+        :param length: how long you want this dataset
+        """
+        self.length = length
+        self.seq = np.random.rand(length, 2)
+
+    def __len__(self):
+        return self.length
+
+    def __getitem__(self, idx):
+        return self.seq[idx]
+
 class DF_Dataset(Dataset):
     def __init__(self ,df, bs ,prepro=lambda x :x.values ,shuffle=False):
         """
