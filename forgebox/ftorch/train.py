@@ -5,15 +5,17 @@ from torch.utils.data import DataLoader
 from tqdm import trange
 from functools import reduce
 import pandas as pd
-
-JUPYTER = True if main.get_ipython else False
+try:
+    JUPYTER = True if main.get_ipython else False
+except:
+    JUPYTER = False
 
 if JUPYTER:from tqdm import tqdm_notebook as tn
 
 class Trainer:
     def __init__(self, dataset, val_dataset=None, batch_size=16,
                  print_on=20, fields=None, is_log=True, shuffle=True,
-                 conn=None, modelName="model", tryName="try", time="timestamp"):
+                 conn=None, modelName="model", tryName="try", callbacks = [], val_callbacks = []):
         """
         Pytorch trainer
         fields: the fields you choose to print out
@@ -21,12 +23,12 @@ class Trainer:
 
         Training:
 
-        write action funtion for a step of training,
+        write action function for a step of training,
         assuming a generator will spit out tuple x,y,z in each:
 
         def action(*args,**kwargs):
             x,y,z = args[0]
-            x,y,z = Variable(x).cuda(),Variable(y).cuda(),Variable(z).cuda()
+            x,y,z = x.cuda(),y.cuda(),z.cuda()
 
             #optimizer is a global variable, or many different optimizers if you like
             sgd.zero_grad()
@@ -60,6 +62,9 @@ class Trainer:
         self.val_dataset = val_dataset
         self.print_on = print_on
 
+        self.callbacks = callbacks
+        self.val_callbacks = val_callbacks
+
         if self.val_dataset:
             self.val_dataset = val_dataset
             self.val_data = DataLoader(self.val_dataset, batch_size=self.batch_size, shuffle=shuffle)
@@ -71,11 +76,11 @@ class Trainer:
         self.is_log = is_log
 
     def get_time(self):
-        return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        return datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
 
     def train(self, epochs, name=None, log_addr=None):
         """
-        Train the model
+        Train the model for some epochs
         """
         if name == None:
             name = "torch_train_" + datetime.now().strftime("%y%m%d_%H%M%S")
@@ -99,6 +104,11 @@ class Trainer:
                                  index=False)
 
     def run(self, epoch):
+        """
+        run for a single epoch
+        :param epoch: the epoch index
+        :return:
+        """
         if JUPYTER:
             t = tn(range(self.train_len))
         else:
@@ -106,7 +116,6 @@ class Trainer:
         self.train_gen = iter(self.train_data)
 
         for i in t:
-
             ret = self.action(next(self.train_gen), epoch=epoch, ite=i)
             ret.update({"epoch": epoch,
                         "iter": i,
@@ -115,6 +124,8 @@ class Trainer:
 
             if i % self.print_on == self.print_on - 1:
                 self.update_descrition(epoch, i, t)
+        for cb_func in self.callbacks:
+            cb_func(record = self.track[epoch],dataset = self.dataset, )
 
         if self.val_dataset:
 
@@ -131,9 +142,10 @@ class Trainer:
                             "iter": i,
                             "ts": self.get_time()})
                 self.val_track[epoch].append(ret)
-
-                # print(self.val_track)
                 self.update_descrition_val(epoch, i, val_t)
+
+            for v_cb_func in self.val_callbacks:
+                v_cb_func(record = self.val_track[epoch],dataset = self.val_dataset, )
 
     def update_descrition(self, epoch, i, t):
         window_df = pd.DataFrame(self.track[epoch][max(i - self.print_on, 0):i])
