@@ -133,14 +133,12 @@ class forgedb(object):
         self.s.commit()
         return w
 
-    def m(self, key, val, big_better = True,
-          remark = None,
-          weight = None):
+    def m_(self, key, val, big_better = True,
+          remark = None,):
         """
         recording the metrics
         key: metric name
         val: metric value
-        weight: weight object, if None, using the latest weight in task
         """
         val = str(val)
         mt = self.s.query(metricModel).filter(metricModel.slug == key, metricModel.task_id == self.task.id).first()
@@ -156,23 +154,41 @@ class forgedb(object):
                              val = str(val),
                              big_better = big_better,
                              remark = remark)
+
+        return mt
+
+    def m(self,key, val, big_better = True,
+          remark = None,weight=None):
+        """
+        recording the metrics
+        key: metric name
+        val: metric value
+        weight: weight object, if None, using the latest weight in task
+        """
+        mt = self.m_(key,val,big_better,remark)
         self.s.add(mt)
         self.s.commit()
         if weight:
-            mw = metricWeight(metric_id = mt.id, weight_id = weightModel, valsnap = str(val))
+            mw = metricWeight(metric_id=mt.id, weight_id=weightModel, valsnap=str(val))
             self.s.add(mw)
             self.s.commit()
+
         return mt
+
 
     def save_metrics(self,metrics,small_list = None, weight = None):
         """
         saving a dictionary of metrics
         :param metrics: dictionary
+        :param small_list: a list of metric names, the smaller value represent better model
         :return:
         """
         if small_list ==None: small_list = []
+        mtlist = []
         for k, v in metrics.items():
             kwa = dict({"key":k,"val":v,"weight":weight})
             if k in small_list:
                 kwa.update({"big_better":False})
-            self.m(**kwa)
+            mtlist.append(self.m_(**kwa))
+        self.s.add_all(mtlist)
+        self.s.commit()
