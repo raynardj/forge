@@ -7,12 +7,17 @@ def recorddf(record):
 
 ## The following are the callbacks for trainer
 
-def print_track(record, dataset):
+def print_all(record, dataset):
     df = recorddf(record)
     mars(df)
 
 
-def stat_track(record, dataset):
+def stat(record, dataset):
+    """
+    Print out track statistics
+    :param record: self.track[epoch] in trainer.run(self.epoch)
+    :param dataset: train dataset or val_dataset
+    """
     df = recorddf(record)
     start = datetime.strptime(list(df["ts"])[0], "%Y-%m-%d %H:%M:%S.%f").timestamp()
     end = datetime.strptime(list(df["ts"])[-1], "%Y-%m-%d %H:%M:%S.%f").timestamp()
