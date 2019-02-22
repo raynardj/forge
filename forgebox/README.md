@@ -14,13 +14,15 @@ SQLALCHEMY_DATABASE_URI = 'sqlite:////mnt/disk1/forge.db')
 
 You can add a task at the Web UI ```http://[host]:[port]/task/add```
 
-## Set/ Read Hyper Params
+## Initiate forge api
 
 ```python
 from forgebox.apicore import forgedb
 fg = forgedb("nlp_binary_classification")
 p = fg.p
 ```
+
+## Set/ Read Hyper Params
 
 Read the hyper param from database
 ```python
@@ -31,5 +33,11 @@ Set a new hyper param, like, 3 epochs for training
 ```python
 epochs = p("nb_epochs",3)
 ```
+
+## Create data format
+
+int and float are already there
+fg.format("str",remark = "String Format")
+
 ## PyTorch Integration
 For pytorch users, Forge is intergrated into the training framework. Check [ftorch](ftorch) for detail

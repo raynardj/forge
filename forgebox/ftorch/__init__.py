@@ -20,7 +20,7 @@ class FG(forgedb):
     def metrics(self, adapt=["mean"], ):
         """
         return a function to save metrics
-        :param adapt: list, default ["mean"], possible values:"mean","min","max"
+        :param adapt: list, default ["mean"], possible values:"mean","min","max","std","20%","50%","70%"
         """
 
         def func(record, dataset):

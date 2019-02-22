@@ -4,12 +4,13 @@ from sqlalchemy.orm import relationship
 
 taskModel = Base.classes.fg_task
 dataFormat = Base.classes.fg_data_format
+trainModel = Base.classes.fg_train
 hyperParam = Base.classes.fg_hyper_param
 weightModel = Base.classes.fg_weight
-hyperParamWeight = Base.classes.fg_hp_weight
+hyperParamLog = Base.classes.fg_hp_log
 mapModel = Base.classes.fg_map
 metricModel = Base.classes.fg_metric
-metricWeight = Base.classes.fg_metric_weight
+metricLog = Base.classes.fg_metric_log
 
 taskModel.__doc__ = """
 Machine Learnin Tasks
@@ -38,16 +39,3 @@ dataFormat.__repr__ = lambda self:self.name
 
 hyperParam.format = relationship(dataFormat)
 
-
-def add_metric(self,metric):
-    """
-    :param metric: A metricModel object
-    :return: A metricWeight object, logging the  metric
-    """
-    metriclog = metricWeight(weight_id = self.id, metric_id = metric.id, valsnap = str(metric.val))
-    session.add(metriclog)
-    session.flush()
-    session.commit()
-    return metriclog
-
-weightModel.add_metric = add_metric

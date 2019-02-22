@@ -1,8 +1,10 @@
-from .dbcore import session, taskModel, weightModel, hyperParam, hyperParamWeight, dataFormat, metricModel, metricWeight
+from .dbcore import session, taskModel, weightModel, hyperParam, \
+    hyperParamLog, dataFormat, metricModel, metricLog, trainModel
 from datetime import datetime
 import json, os
 from .utils import create_dir
 from .config import DATADIR
+
 
 # todo decide whether should I need an independent metric object
 # class metric(object):
@@ -13,19 +15,20 @@ from .config import DATADIR
 #         self.metric = self.s.query(metricModel).fitler(metricModel.slug == metric_slug).first()
 
 class forgedb(object):
-    def __init__(self, task, remark="created_in_code", framewk="pytorch", verbose = True):
+    def __init__(self, task, remark="created_in_code", framewk="pytorch", verbose=True):
         """
         connect to a task, will create a new task if not already established
         :param task: task name string
         :param remark: Introduction about this task
         """
-        super(forgedb, self).__init__()
+        super().__init__()
         self.s = session
         self.task = self.s.query(taskModel).filter(taskModel.taskname == task).first()
         self.verbose = verbose
         if self.task == None:
-            if self.verbose:print("[creating task:%s]"%(task))
-            taskitem = taskModel(taskname=task, remark=remark)
+            if self.verbose: print("[creating task:%s]" % (task))
+            taskitem = taskModel(taskname=task, remark=remark,
+                                 created_at=datetime.now(), updated_at=datetime.now())
             self.s.add(taskitem)
             self.s.flush()
             self.s.commit()
@@ -39,6 +42,9 @@ class forgedb(object):
         self.framewk = framewk
         self.set_hp_attributes()
         self.modelnow = self.new_model_name()
+        self.format("float", "Float Format")
+        self.format("int", "Integer Format")
+        self.format("str", "String Format")
 
     def __repr__(self):
         return "[forge:%s]" % (self.task.taskname)
@@ -95,7 +101,10 @@ class forgedb(object):
             if hp:
                 return eval(hp.format.name)(hp.val)
 
-    def get_format(self,val):
+    def add_train(self):
+        pass #todo: add train function
+
+    def get_format(self, val):
         """
         A sample value to return format object
         :param val: sample value
@@ -115,7 +124,7 @@ class forgedb(object):
         self.modelnow = "%s_%s" % (self.task.taskname, extra_name)
         return self.modelnow
 
-    def log_weights(self, path, modelname=None, framewk=None):
+    def log_weights(self, path, modelname=None, framewk=None):  # todo, change it with train
         hplist, hpdict = self.hp2dict()
         if framewk:
             self.framewk = framewk
@@ -128,13 +137,14 @@ class forgedb(object):
         self.s.add(w)
         # self.s.flush()
         self.s.commit()
-        wlist = (hyperParamWeight(hp_id=hp.id, weight_id=w.id, valsnap=hp.val) for hp in hplist)
+        wlist = (hyperParamLog(hp_id=hp.id, weight_id=w.id, valsnap=hp.val) for hp in
+                 hplist)  # todo, change it with train
         self.s.add_all(wlist)
         self.s.commit()
         return w
 
-    def m_(self, key, val, big_better = True,
-          remark = None,):
+    def m_(self, key, val, big_better=True,
+           remark=None, ):
         """
         recording the metrics
         key: metric name
@@ -143,52 +153,68 @@ class forgedb(object):
         val = str(val)
         mt = self.s.query(metricModel).filter(metricModel.slug == key, metricModel.task_id == self.task.id).first()
         if remark == None:
-            remark = "creating from task:%s"%(self.task.taskname)
+            remark = "creating from task:%s" % (self.task.taskname)
         if mt:
             mt.val = val
         else:
             fmt = self.get_format(val)
-            mt = metricModel(slug = key,
-                             task_id = self.task.id,
-                             format_id = fmt.id,
-                             val = str(val),
-                             big_better = big_better,
-                             remark = remark)
+            mt = metricModel(slug=key,
+                             task_id=self.task.id,
+                             format_id=fmt.id,
+                             val=str(val),
+                             big_better=big_better,
+                             remark=remark)
 
         return mt
 
-    def m(self,key, val, big_better = True,
-          remark = None,weight=None):
+    def m(self, key, val, big_better=True,
+          remark=None, weight=None):
         """
         recording the metrics
         key: metric name
         val: metric value
         weight: weight object, if None, using the latest weight in task
         """
-        mt = self.m_(key,val,big_better,remark)
+        mt = self.m_(key, val, big_better, remark)
+        # todo: save metric log
         self.s.add(mt)
         self.s.commit()
         if weight:
-            mw = metricWeight(metric_id=mt.id, weight_id=weightModel, valsnap=str(val))
+            mw = metricLog(metric_id=mt.id, weight_id=weightModel, valsnap=str(val))  # todo, change it with train
             self.s.add(mw)
             self.s.commit()
 
         return mt
 
+    def format(self, name, remark=None):
+        """
+        get the format by name, like str
+        , if not found,
+        registering format
+        :param obj: format class
+        """
+        fmt = self.s.query(dataFormat).filter(dataFormat.name == name).first()
+        if fmt == None:
+            fmt = dataFormat(name=name, remark=remark)
+            self.s.add(fmt)
+            self.s.commit()
+            print("[creating format :%s] for 1st and last time" % (name), flush=True)
+        return fmt
 
-    def save_metrics(self,metrics,small_list = None, weight = None):
+    def save_metrics(self, metrics, small_list=None, weight=None):
         """
         saving a dictionary of metrics
         :param metrics: dictionary
         :param small_list: a list of metric names, the smaller value represent better model
         :return:
         """
-        if small_list ==None: small_list = []
+        if small_list == None: small_list = []
         mtlist = []
         for k, v in metrics.items():
-            kwa = dict({"key":k,"val":v,"weight":weight})
+            kwa = dict({"key": k, "val": v})
             if k in small_list:
-                kwa.update({"big_better":False})
+                kwa.update({"big_better": False})
             mtlist.append(self.m_(**kwa))
+        # todo: group saving waits
         self.s.add_all(mtlist)
         self.s.commit()

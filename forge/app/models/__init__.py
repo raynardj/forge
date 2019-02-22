@@ -15,5 +15,5 @@ class tsMixin(object):
     updated_at = db.Column(
         db.DateTime, default=datetime.now, onupdate=datetime.now, nullable=True)
 
-from .ml_model import taskModel, hyperParam, dataFormat, weightModel, hyperParamWeight, metricModel, metricWeight
+from .ml_model import taskModel, hyperParam, dataFormat, trainModel, weightModel, hyperParamLog, metricModel, metricLog
 from .post_model import postModel
