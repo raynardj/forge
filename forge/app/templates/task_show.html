@@ -1,0 +1,22 @@
+{% extends "appbuilder/base.html"%}
+{% import 'appbuilder/general/lib.html' as lib %}
+{% import 'page_header.html' as ph %}
+{% import 'table.html' as dftb %}
+{% import 'dict_table.html' as dicttb %}
+
+{% block content %}
+{{ ph.page_header(task.taskname, task.remark) }}
+
+
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Task Introduction
+        <div class = 'btn btn-default'><a href = '/task/edit/{{task.id}}'>Edit Task</a></div>
+    </h3>
+  </div>
+  <div class="panel-body">
+   {{ dicttb.dict_table(intro) }}
+  </div>
+</div>
+
+{% endblock %}
