@@ -1,0 +1,31 @@
+{%macro dftable(df_dict,cols=None)%}
+<div>
+    {% if df_dict|length %}
+  <table class="table">
+      {%if "0" in df_dict.keys() %}{%set keylist = df_dict["0"].keys()%}{%endif%}
+      {%if 0 in df_dict.keys() %}{%set keylist = df_dict[0].keys()%}{%endif%}
+      {%if cols %}{%set keylist = cols%}{%endif%}
+      <tr>{%for k in keylist%}<th>{{k}}</th>{%endfor%}</tr>
+      {% for ridx,r in df_dict.items() %}
+      <tr>
+          {% for cidx,c in r.items() %}<td>{{c|safe}}</td>{%endfor%}
+      </tr>
+      {% endfor %}
+  </table>
+    {% else %}
+    No Record
+    {% endif %}
+</div>
+{%endmacro%}
+
+{%if df_dict%}
+{%if cols%}
+{{dftable(df_dict,cols)}}
+{%else%}
+{{dftable(df_dict)}}
+{%endif%}
+{%endif%}
+
+{%if dict_%}
+{{dftable(dict_)}}
+{%endif%}
