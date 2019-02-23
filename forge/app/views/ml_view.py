@@ -101,10 +101,10 @@ class metricView(ModelView):
 
     label_columns = {"bestyet": "Best so far", "val": "Value"}
 
-    add_columns = ["slug", "task", "format", "val", "big_better", "remark", "weights", "bestyet"]
-    edit_columns = ["slug", "task", "format", "val", "big_better", "remark", "weights", "bestyet"]
-    show_columns = ["slug", "task", "format", "val", "big_better", "remark", "weights", "bestyet", *tscol]
-    list_columns = ["slug", "task", "format", "val", "big_better", "remark", "weights", "bestyet", *tscol]
+    add_columns = ["slug", "task", "format", "val", "big_better", "remark", "bestyet"]
+    edit_columns = ["slug", "task", "format", "val", "big_better", "remark", "bestyet"]
+    show_columns = ["slug", "task", "format", "val", "big_better", "remark", "bestyet", *tscol]
+    list_columns = ["slug", "task", "format", "val", "big_better", "remark", "bestyet", *tscol]
 
 
 class metricLogView(ModelView):

@@ -13,7 +13,7 @@ except:
 if JUPYTER:from tqdm import tqdm_notebook as tn
 
 class Trainer:
-    def __init__(self, dataset, val_dataset=None, batch_size=16,
+    def __init__(self, dataset, val_dataset=None, batch_size=16, fg = None,
                  print_on=20, fields=None, is_log=True, shuffle=True,
                  conn=None, modelName="model", tryName="try", callbacks = [], val_callbacks = []):
         """
@@ -55,6 +55,7 @@ class Trainer:
         self.batch_size = batch_size
         self.dataset = dataset
         self.conn = conn
+        self.fg = fg
         self.modelName = modelName
         self.tryName = tryName
         self.train_data = DataLoader(self.dataset, batch_size=self.batch_size, shuffle=shuffle)
@@ -102,6 +103,9 @@ class Trainer:
                 val_track = pd.DataFrame(reduce((lambda x, y: x + y), list(self.val_track.values())))
                 val_track.to_csv(log_addr + "val_" + datetime.now().strftime("%y_%m_%d__%H_%M_%S") + ".csv",
                                  index=False)
+
+        if self.fg:
+            return self.fg.new_train()
 
     def run(self, epoch):
         """
@@ -197,7 +201,7 @@ class Trainer:
 
         return pd.DataFrame(tracks)
 
-    def save_track(self, filepath, val_filepath=None):
+    def save_track(self, filepath, val_filepath=None): # todo: move this to a callback
         """
         Save the track to csv files in a path you designated,
         :param filepath: a file path ended with .csv

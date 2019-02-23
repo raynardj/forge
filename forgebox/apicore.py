@@ -5,17 +5,12 @@ import json, os
 from .utils import create_dir
 from .config import DATADIR
 
+tsDict = {"created_at": datetime.now(), "updated_at": datetime.now()}
+tsDict_ = {"updated_at": datetime.now()}
 
-# todo decide whether should I need an independent metric object
-# class metric(object):
-#     def __init__(self, metric_slug, task_id):
-#         super(metric,self).__init__()
-#         self.s = session
-#         self.task = self.s.query(taskModel).filter(taskModel.id == task_id).first()
-#         self.metric = self.s.query(metricModel).fitler(metricModel.slug == metric_slug).first()
 
 class forgedb(object):
-    def __init__(self, task, remark="created_in_code", framewk="pytorch", verbose=True):
+    def __init__(self, task, remark="created_in_code", framewk="pytorch", verbose=True, log_hparam_read=False):
         """
         connect to a task, will create a new task if not already established
         :param task: task name string
@@ -25,6 +20,7 @@ class forgedb(object):
         self.s = session
         self.task = self.s.query(taskModel).filter(taskModel.taskname == task).first()
         self.verbose = verbose
+        self.log_hparam_read = log_hparam_read
         if self.task == None:
             if self.verbose: print("[creating task:%s]" % (task))
             taskitem = taskModel(taskname=task, remark=remark,
@@ -45,6 +41,7 @@ class forgedb(object):
         self.format("float", "Float Format")
         self.format("int", "Integer Format")
         self.format("str", "String Format")
+        self.new_train()
 
     def __repr__(self):
         return "[forge:%s]" % (self.task.taskname)
@@ -82,27 +79,58 @@ class forgedb(object):
             if hp:
                 hp.val = str(val)
                 hp.updated_at = datetime.now()
-                self.s.add(hp)
-                self.s.commit()
-                return eval(hp.format.name)(hp.val)
+
             else:
                 fmt = self.get_format(val)
                 hp = hyperParam(task_id=self.task.id,
                                 slug=key,
                                 remark="Created in task %s" % (self.task.taskname),
-                                format_id=fmt.id,
-                                created_at=datetime.now(),
-                                updated_at=datetime.now(), val=str(val))
-                self.s.add(hp)
-                self.s.commit()
-                return eval(hp.format.name)(hp.val)
+                                format_id=fmt.id, **tsDict, val=str(val))
+            self.s.add(hp)
+            self.s.commit()
+            # write a log of new entry
+            hplog = hyperParamLog(hp_id=hp.id, train_id=self.train.id, valsnap=hp.val, **tsDict)
+            self.s.add(hplog)
+            self.s.commit()
+            return eval(hp.format.name)(hp.val)
         else:
             hp = self.s.query(hyperParam).filter(hyperParam.slug == key, hyperParam.task_id == self.task.id).first()
             if hp:
+                if self.log_hparam_read:
+                    hplog = hyperParamLog(hp_id=hp.id, train_id=self.train.id, valsnap=hp.val, **tsDict)
+                    self.s.add(hplog)
+                    self.s.commit()
                 return eval(hp.format.name)(hp.val)
 
-    def add_train(self):
-        pass #todo: add train function
+    def new_train(self, trainname=None, remark=None):
+        """
+        Add a training
+        :param trainname:
+        :param remark:
+        :return:
+        """
+        if trainname == None: trainname = "%s-%s" % (self.task.taskname, datetime.now().strftime("%H:%M:%S %Y-%m-%d"))
+        if remark == None: remark = "train was generated in code"
+        train = trainModel(name=trainname, task_id=self.task.id, remark=remark, **tsDict)
+        self.s.add(train)
+        self.s.commit()
+        self.train = train
+        return train
+
+    def format(self, name, remark=None):
+        """
+        get the format by name, like str
+        , if not found,
+        registering format
+        :param obj: format class
+        """
+        fmt = self.s.query(dataFormat).filter(dataFormat.name == name).first()
+        if fmt == None:
+            fmt = dataFormat(name=name, remark=remark, **tsDict)
+            self.s.add(fmt)
+            self.s.commit()
+            print("[creating format :%s] for 1st and last time" % (name), flush=True)
+        return fmt
 
     def get_format(self, val):
         """
@@ -110,11 +138,8 @@ class forgedb(object):
         :param val: sample value
         :return: format object
         """
-        fmt = self.s.query(dataFormat).filter(dataFormat.name == type(val).__name__).first()
-        if fmt == None:
-            assert False, "No such format set yet: %s" % (type(val))
-        else:
-            return fmt
+        typename = type(val).__name__
+        return self.format(name=typename)
 
     def new_model_name(self, extra_name="model"):
         """
@@ -124,22 +149,17 @@ class forgedb(object):
         self.modelnow = "%s_%s" % (self.task.taskname, extra_name)
         return self.modelnow
 
-    def log_weights(self, path, modelname=None, framewk=None):  # todo, change it with train
+    def save_weights(self, path, modelname=None, framewk=None):
         hplist, hpdict = self.hp2dict()
         if framewk:
             self.framewk = framewk
         mn = modelname if modelname else self.modelnow
         w = weightModel(task_id=self.task.id, name=mn,
-                        path=path, framewk=self.framewk,
+                        path=path, framewk=self.framewk, train_id=self.train.id,
                         params_json=json.dumps(hpdict),
-                        created_at=datetime.now(), updated_at=datetime.now(),
+                        **tsDict,
                         )
         self.s.add(w)
-        # self.s.flush()
-        self.s.commit()
-        wlist = (hyperParamLog(hp_id=hp.id, weight_id=w.id, valsnap=hp.val) for hp in
-                 hplist)  # todo, change it with train
-        self.s.add_all(wlist)
         self.s.commit()
         return w
 
@@ -156,6 +176,7 @@ class forgedb(object):
             remark = "creating from task:%s" % (self.task.taskname)
         if mt:
             mt.val = val
+            mt.updated_at = datetime.now()
         else:
             fmt = self.get_format(val)
             mt = metricModel(slug=key,
@@ -163,45 +184,30 @@ class forgedb(object):
                              format_id=fmt.id,
                              val=str(val),
                              big_better=big_better,
-                             remark=remark)
+                             remark=remark,
+                             **tsDict)
 
         return mt
 
     def m(self, key, val, big_better=True,
-          remark=None, weight=None):
+          remark=None, ):
         """
         recording the metrics
         key: metric name
         val: metric value
         weight: weight object, if None, using the latest weight in task
         """
-        mt = self.m_(key, val, big_better, remark)
-        # todo: save metric log
+        # Saving the current metric
+        mt = self.m_(key, val, big_better, remark)  # update or new
         self.s.add(mt)
         self.s.commit()
-        if weight:
-            mw = metricLog(metric_id=mt.id, weight_id=weightModel, valsnap=str(val))  # todo, change it with train
-            self.s.add(mw)
-            self.s.commit()
-
+        # Saving the metric log
+        mlog = metricLog(metric_id=mt.id, train_id=self.train.id, valsnap=str(val), **tsDict)
+        self.s.add(mlog)
+        self.s.commit()
         return mt
 
-    def format(self, name, remark=None):
-        """
-        get the format by name, like str
-        , if not found,
-        registering format
-        :param obj: format class
-        """
-        fmt = self.s.query(dataFormat).filter(dataFormat.name == name).first()
-        if fmt == None:
-            fmt = dataFormat(name=name, remark=remark)
-            self.s.add(fmt)
-            self.s.commit()
-            print("[creating format :%s] for 1st and last time" % (name), flush=True)
-        return fmt
-
-    def save_metrics(self, metrics, small_list=None, weight=None):
+    def save_metrics(self, metrics, small_list=None): # todo improve small list
         """
         saving a dictionary of metrics
         :param metrics: dictionary
@@ -211,10 +217,7 @@ class forgedb(object):
         if small_list == None: small_list = []
         mtlist = []
         for k, v in metrics.items():
-            kwa = dict({"key": k, "val": v})
+            kwa = dict({"key": k, "val": v, })
             if k in small_list:
                 kwa.update({"big_better": False})
-            mtlist.append(self.m_(**kwa))
-        # todo: group saving waits
-        self.s.add_all(mtlist)
-        self.s.commit()
+            self.m(**kwa, )

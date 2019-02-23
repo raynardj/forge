@@ -99,7 +99,7 @@ class hyperParamLog(tsMixin, Model):
     valsnap = db.Column(db.String(255), nullable=True)  # snapshot of hyper param value
 
     def __repr__(self):
-        return str(self.weight.name) + "|" + str(self.hyperparam.slug)
+        return str(self.train.name) + "|" + str(self.hyperparam.slug)
 
 
 class mapModel(tsMixin, Model):
