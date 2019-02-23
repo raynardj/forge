@@ -1,0 +1,15 @@
+{%macro dict_table(dict_)%}
+<div>
+  <table class="table">
+      {% for k,v in dict_.items() %}
+      <tr>
+          <th>{{k}}</th><td>{{v|safe}}</td>
+      </tr>
+      {% endfor %}
+  </table>
+</div>
+{%endmacro%}
+
+{%if dict_%}
+{{dict_table(dict_)}}
+{%endif%}

@@ -11,15 +11,36 @@ class taskView(ModelView):
     datamodel = SQLAInterface(taskModel)
 
     label_columns = {"taskname": "Task", "owner": "Owner", "remark": "Remark", "metrics": "Last Metrics",
-                     "created_at": "Create", "updated_at": "Update"}
+                     "created_at": "Create", "updated_at": "Update","taskdetail":"Task Detail"}
+
     list_title = "Machine Learning Tasks"
     show_title = "Machine Learning Task"
     edit_title = "Machine Learning Task"
     add_title = "Machine Learning Task"
-    list_columns = ["id", "taskname", "owner", "remark", *tscol]
+
+    list_columns = ["id", "taskdetail", "taskname", "owner", "remark", *tscol]
     show_columns = ["id", "taskname", "owner", "remark", "metrics", *tscol]
     edit_columns = ["taskname", "owner", "remark"]
     add_columns = ["taskname", "owner", "remark"]
+
+    @expose("/taskdetail/<task_id>/")
+    def taskdetail(self, task_id):
+        task = self.datamodel.get(task_id)
+        intro_dict = {
+            "Task ID": task.id,
+            "Task Name": task.taskname,
+            "Owner": task.owner if task.owner else "No owner yet",
+            "Remark": task.remark,
+            "Created At": task.created_at.strftime("%Y-%m-%d %H:%M:%S") if task.created_at else "Not Set",
+            "Updated At": task.updated_at.strftime("%Y-%m-%d %H:%M:%S") if task.updated_at else "Not Set",
+            "Latest H-Params": self.render_template("dict_table.html",
+                                                    dict_=dict((hp.slug, hp.val) for hp in list(task.hyper_params))) if len(list(task.hyper_params))>0 else None,
+            "Latest Metrics":self.render_template("dict_table.html",
+                                                  dict_=dict((mt.slug, mt.val) for mt in list(task.metrics)))if len(list(task.metrics))>0 else None,
+        }
+        return self.render_template("task_show.html", task=task, intro=intro_dict)
+
+    # todo: A more fancy task show page
 
 
 class formatView(ModelView):
@@ -44,6 +65,8 @@ class trainView(ModelView):
     edit_columns = ["task", "name", "remark"]
     show_columns = ["id", "task", "name", "remark", *tscol]
     list_columns = ["id", "task", "name", "remark", *tscol]
+
+    # todo: A more fancy task show page
 
 
 class hyperParamView(ModelView):
@@ -75,6 +98,7 @@ class weightView(ModelView):
     edit_columns = ["task", "name", "path", "framewk", "params_json", "remark"]
     list_columns = ["id", "task", "name", "path", "framewk", "params_json", "remark", *tscol]
     show_columns = ["id", "task", "name", "path", "framewk", "params_json", "remark", *tscol]
+
 
 class hyperParamLogView(ModelView):
     route_base = "/hplog"
