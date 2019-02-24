@@ -1,5 +1,6 @@
 from .dbcore import session, taskModel, weightModel, hyperParam, \
     hyperParamLog, dataFormat, metricModel, metricLog, trainModel
+from pathlib import Path
 from datetime import datetime
 import json, os
 from .utils import create_dir
@@ -29,19 +30,26 @@ class forgedb(object):
             self.s.flush()
             self.s.commit()
             self.task = taskitem
-        self.taskdir = os.path.join(DATADIR, self.task.taskname)
+        self.taskdir = Path(os.path.join(DATADIR, self.task.taskname))
+        self.weightdir = self.taskdir/"weights"
+        self.logsdir = self.taskdir/"logs"
         create_dir(self.taskdir)
+        create_dir(self.weightdir)
+        create_dir(self.logsdir)
         self.hp2dict()
         if self.verbose:
             print("=" * 10 + "hyper params" + "=" * 10)
             print(self.confdict)
         self.framewk = framewk
-        self.set_hp_attributes()
-        self.modelnow = self.new_model_name()
+
+        # check/update necessary formats
         self.format("float", "Float Format")
         self.format("int", "Integer Format")
         self.format("str", "String Format")
+
+        self.set_hp_attributes()
         self.new_train()
+        self.modelnow = self.new_model_name()
 
     def __repr__(self):
         return "[forge:%s]" % (self.task.taskname)
@@ -146,7 +154,7 @@ class forgedb(object):
         :param extra_name: optional, default model, describe this in 1 consequtive string, something like model structure
         :return: a model name
         """
-        self.modelnow = "%s_%s" % (self.task.taskname, extra_name)
+        self.modelnow = "%s_%s_%s" % (self.task.taskname, extra_name, self.train.id)
         return self.modelnow
 
     def save_weights(self, path, modelname=None, framewk=None):
@@ -155,7 +163,7 @@ class forgedb(object):
             self.framewk = framewk
         mn = modelname if modelname else self.modelnow
         w = weightModel(task_id=self.task.id, name=mn,
-                        path=path, framewk=self.framewk, train_id=self.train.id,
+                        path=str(path), framewk=self.framewk, train_id=self.train.id,
                         params_json=json.dumps(hpdict),
                         **tsDict,
                         )
