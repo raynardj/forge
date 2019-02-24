@@ -9,13 +9,6 @@ class FG(forgedb):
     def __init__(self, *args, **kwargs):
         super(FG, self).__init__(*args, **kwargs)
 
-    def save_weights(self, model, modelname=None):
-        weightname = "%s_torch_%s.npy" % (self.modelnow, str(int(datetime.now().timestamp() * 100)))
-        path = os.path.join(self.taskdir, weightname)
-        torch.save(model.state_dict(), path)
-        w = self.log_weights(path, framewk="pytorch")
-        return w
-
     # callbacks
     def metrics(self, adapt=["mean"], ):
         """
@@ -35,3 +28,29 @@ class FG(forgedb):
             return metric_dict
 
         return func
+
+    def weights(self, model, name=None):
+        """
+        A callback function to save weights
+        fg = FG(task = "wgan")
+        Trianer(...., callbacks = [fg.wegiths(model_G, name='wgan_g'), fg.weights(model_D,name = 'wgan_d')])
+        :param model: A pytorch model
+        :param name: Name string of the model, no space and strange charactors
+        :return: A weigthModel object
+        """
+        fgobj = self
+        name_ = name
+        if name_ == None:
+            name_ = self.new_model_name()
+        else:  # todo: add a regex to validate a consequtive sting
+            name_ = "%s_%s" % (self.train.id, name_)
+
+        def f(record, dataset):
+            epoch = list(recorddf(record).epoch)[0]
+            name_epoch = "%s.e%s" % (name_, epoch)
+            path = self.weightdir / ("%s" % (name_epoch if name_epoch[-4:] == ".npy" else "%s.npy" % (name_epoch)))
+            if fgobj.verbose: print("[Model Save]:%s" % (path))
+            torch.save(model.state_dict(), path)
+            return fgobj.save_weights(path, modelname=name_epoch, framewk="pytorch")
+
+        return f
