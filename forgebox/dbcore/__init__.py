@@ -11,4 +11,5 @@ Base.prepare(engine, reflect=True)
 
 session = Session(engine)
 
-from .ml_base import taskModel, dataFormat, hyperParam, hyperParamLog, weightModel, metricModel, metricLog, trainModel
+from .ml_base import taskModel, dataFormat, hyperParam, hyperParamLog, weightModel, metricModel, metricLog, trainModel, \
+    logModel, keyMetricModel

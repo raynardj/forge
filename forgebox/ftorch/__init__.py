@@ -36,7 +36,7 @@ class FG(forgedb):
         Trianer(...., callbacks = [fg.wegiths(model_G, name='wgan_g'), fg.weights(model_D,name = 'wgan_d')])
         :param model: A pytorch model
         :param name: Name string of the model, no space and strange charactors
-        :return: A weigthModel object
+        :return: a function, result of the decorator
         """
         fgobj = self
         name_ = name
@@ -53,4 +53,19 @@ class FG(forgedb):
             torch.save(model.state_dict(), path)
             return fgobj.save_weights(path, modelname=name_epoch, framewk="pytorch")
 
+        return f
+
+    def logs(self,train = True):
+        """
+        Saving the logs for training validation to csv
+        :param train: Bool, True for training, False for validation
+        :return: a function, result of the decorator
+        """
+        def f(record, dataset):
+            df = recorddf(record)
+            epoch = list(df.epoch)[0]
+            path = self.logsdir/("%s_%s.%s.csv"%(self.task, self.train.id if train else "val.%s"%(self.train.id),epoch))
+            path = str(path)
+            df.to_csv(path, index = False)
+            self.log_record(path)
         return f

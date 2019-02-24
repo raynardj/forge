@@ -160,3 +160,12 @@ class keyMetricModel(tsMixin, Model):
     metric = db.relationship(metricModel, foreign_keys=[metric_id], backref="kmetrics")
     best_metric_id = db.Column(db.Integer, db.ForeignKey(metricLog.id))
     best_metric = db.relationship(metricLog, foreign_keys=[best_metric_id], backref="kmetrics")
+
+class logModel(tsMixin, Model):
+    __tablename__ = "fg_run_log"
+    id = db.Column(db.Integer, primary_key=True)
+    task_id = db.Column(db.Integer, db.ForeignKey(taskModel.id))
+    task = db.relationship(taskModel, foreign_keys=[task_id], backref="logs")
+    train_id = db.Column(db.Integer, db.ForeignKey(trainModel.id))
+    train = db.relationship(trainModel, foreign_keys=[train_id], backref="logs")
+    path = db.Column(db.Text(), nullable=True)
