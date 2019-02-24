@@ -1,0 +1,10 @@
+{%macro link_btn(txt,link,theme="btn-default")%}
+<a  class="btn {{theme}}" href="{{link}}">
+{{txt|safe}}
+</a>
+{%endmacro%}
+
+{% if btn_dict %}
+{%if btn_dict.theme%}{% set theme=btn_dict.theme %}{%else%}{%set theme="btn-default"%}{%endif%}
+{{link_btn(btn_dict.txt,btn_dict.link,theme)}}
+{% endif %}

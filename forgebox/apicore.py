@@ -1,5 +1,5 @@
 from .dbcore import session, taskModel, weightModel, hyperParam, \
-    hyperParamLog, dataFormat, metricModel, metricLog, trainModel
+    hyperParamLog, dataFormat, metricModel, metricLog, trainModel, logModel
 from pathlib import Path
 from datetime import datetime
 import json, os
@@ -31,8 +31,8 @@ class forgedb(object):
             self.s.commit()
             self.task = taskitem
         self.taskdir = Path(os.path.join(DATADIR, self.task.taskname))
-        self.weightdir = self.taskdir/"weights"
-        self.logsdir = self.taskdir/"logs"
+        self.weightdir = self.taskdir / "weights"
+        self.logsdir = self.taskdir / "logs"
         create_dir(self.taskdir)
         create_dir(self.weightdir)
         create_dir(self.logsdir)
@@ -215,7 +215,7 @@ class forgedb(object):
         self.s.commit()
         return mt
 
-    def save_metrics(self, metrics, small_list=None): # todo improve small list
+    def save_metrics(self, metrics, small_list=None):  # todo improve small list
         """
         saving a dictionary of metrics
         :param metrics: dictionary
@@ -229,3 +229,10 @@ class forgedb(object):
             if k in small_list:
                 kwa.update({"big_better": False})
             self.m(**kwa, )
+
+    def log_record(self, path):
+        l = logModel(path=path, train_id=self.train.id, task_id=self.task.id, **tsDict)
+        self.s.add(l)
+        self.s.commit()
+        if self.verbose: print("[log saved to]:%s" % (path), flush=True)
+        return l

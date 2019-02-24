@@ -146,3 +146,5 @@ class metricLogView(ModelView):
     edit_columns = ["metric", "train", "valsnap"]
     show_columns = ["metric", "train", "valsnap", *tscol]
     list_columns = ["metric", "train", "valsnap", *tscol]
+
+# todo create a log view

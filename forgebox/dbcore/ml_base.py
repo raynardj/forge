@@ -11,6 +11,8 @@ hyperParamLog = Base.classes.fg_hp_log
 mapModel = Base.classes.fg_map
 metricModel = Base.classes.fg_metric
 metricLog = Base.classes.fg_metric_log
+keyMetricModel = Base.classes.fg_key_metric
+logModel = Base.classes.fg_run_log
 
 taskModel.__doc__ = """
 Machine Learnin Tasks

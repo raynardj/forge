@@ -201,15 +201,15 @@ class Trainer:
 
         return pd.DataFrame(tracks)
 
-    def save_track(self, filepath, val_filepath=None): # todo: move this to a callback
-        """
-        Save the track to csv files in a path you designated,
-        :param filepath: a file path ended with .csv
-        :return: None
-        """
-        self.todataframe(self.track).to_csv(filepath, index=False)
-        if val_filepath:
-            self.todataframe(self.val_track).to_csv(val_filepath, index=False)
+    # def save_track(self, filepath, val_filepath=None):
+    #     """
+    #     Save the track to csv files in a path you designated,
+    #     :param filepath: a file path ended with .csv
+    #     :return: None
+    #     """
+    #     self.todataframe(self.track).to_csv(filepath, index=False)
+    #     if val_filepath:
+    #         self.todataframe(self.val_track).to_csv(val_filepath, index=False)
 
     def step_train(self,f):
         def wraper(*args,**kwargs):

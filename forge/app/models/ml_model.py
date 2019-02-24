@@ -24,6 +24,10 @@ class taskModel(tsMixin, Model):
         except Exception as e:
             return None
 
+    @property
+    def taskdetail(self):
+        return "<a class='btn btn-default' href='/task/taskdetail/%s/' target_ = 'blank'>Task Detail</a>"%(self.id)
+
     owner = db.relationship(security_manager.user_model)
 
     def __repr__(self):
@@ -45,7 +49,7 @@ class trainModel(tsMixin, Model):
     __tablename__ = "fg_train"
     id = db.Column(db.Integer, primary_key=True)
     task_id = db.Column(db.Integer, db.ForeignKey(taskModel.id))
-    task = db.relationship(taskModel)
+    task = db.relationship(taskModel, backref="trains")
     name = db.Column(db.String(255), nullable=True)
     remark = db.Column(db.Text(), nullable=True)
 
@@ -63,7 +67,7 @@ class hyperParam(tsMixin, Model):
     val = db.Column(db.String(255), nullable=True)
     remark = db.Column(db.Text(), nullable=True)
 
-    task = db.relationship(taskModel)
+    task = db.relationship(taskModel, backref="hyper_params")
     format = db.relationship(dataFormat)
 
     def __repr__(self):
@@ -95,7 +99,7 @@ class hyperParamLog(tsMixin, Model):
     hp_id = db.Column(db.Integer, db.ForeignKey(hyperParam.id))
     hyperparam = db.relationship(hyperParam, foreign_keys=[hp_id], backref="trains")
     train_id = db.Column(db.Integer, db.ForeignKey(trainModel.id))
-    train = db.relationship(trainModel, foreign_keys=[train_id], backref="hyper_params")
+    train = db.relationship(trainModel, foreign_keys=[train_id])
     valsnap = db.Column(db.String(255), nullable=True)  # snapshot of hyper param value
 
     def __repr__(self):
@@ -135,11 +139,10 @@ class metricModel(tsMixin, Model):
     def __repr__(self):
         return "%s:%s" % (self.slug, self.val)
 
-
 class metricLog(tsMixin, Model):
     __tablename__ = "fg_metric_log"
     id = db.Column(db.Integer, primary_key=True)
-    metric_id = db.Column(db.Integer, db.ForeignKey(metricModel.id))
+    metric_id = db.Column(db.Integer, db.ForeignKey(metricModel.id),)
     metric = db.relationship(metricModel, foreign_keys=[metric_id], backref="weights")
     task_id = db.Column(db.Integer, db.ForeignKey(taskModel.id))
     task = db.relationship(taskModel)
@@ -148,4 +151,21 @@ class metricLog(tsMixin, Model):
     valsnap = db.Column(db.String(255), nullable=True)  # snapshot of hyper param value
 
     def __repr__(self):
-        return str(self.weight.name) + "|" + str(self.metric.slug)
+        return str(self.train.name) + "|" + str(self.metric.slug)
+
+class keyMetricModel(tsMixin, Model):
+    __tablename__ = "fg_key_metric"
+    id = db.Column(db.Integer, primary_key=True)
+    metric_id = db.Column(db.Integer, db.ForeignKey(metricModel.id), )
+    metric = db.relationship(metricModel, foreign_keys=[metric_id], backref="kmetrics")
+    best_metric_id = db.Column(db.Integer, db.ForeignKey(metricLog.id))
+    best_metric = db.relationship(metricLog, foreign_keys=[best_metric_id], backref="kmetrics")
+
+class logModel(tsMixin, Model):
+    __tablename__ = "fg_run_log"
+    id = db.Column(db.Integer, primary_key=True)
+    task_id = db.Column(db.Integer, db.ForeignKey(taskModel.id))
+    task = db.relationship(taskModel, foreign_keys=[task_id], backref="logs")
+    train_id = db.Column(db.Integer, db.ForeignKey(trainModel.id))
+    train = db.relationship(trainModel, foreign_keys=[train_id], backref="logs")
+    path = db.Column(db.Text(), nullable=True)
