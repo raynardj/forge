@@ -1,0 +1,45 @@
+{%from "dict_table.html" import dict_table%}
+{%macro train_panel(train)%}
+<div class="panel panel-primary">
+    <div class="panel-body">
+        {{train.name}}
+    </div>
+    <div class="panel-footer">
+        <table class="table">
+            <tr>
+                <th>Name</th>
+                <td>{{train.name}}</td>
+            </tr>
+            <tr>
+                <th>Hyper Parameters</th>
+                <td>
+                    {% for l in train.hps %}
+                    <div class="btn btn-success">{{l.hyperparam.slug}}<span class="badge">{{l.valsnap}}</span></div>
+                    {% endfor %}
+                </td>
+            </tr>
+            <tr>
+                <th>Metrics</th>
+                <td>
+                    {% for l in train.metrics %}
+                    <div class="btn btn-default">{{l.metric.slug}}<span class="badge">{{l.valsnap}}</span></div>
+                    {% endfor %}
+                </td>
+            </tr>
+            <tr>
+                <th>logs</th>
+                <td>
+                    {% for l in train.logs %}
+                    <div class="btn btn-primary">{{l.path}}</div>
+                    {% endfor %}
+                </td>
+            </tr>
+
+        </table>
+
+    </div>
+</div>
+{%endmacro%}
+{%if train%}
+{{train_panel(train)}}
+{%endif%}

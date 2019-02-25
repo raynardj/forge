@@ -37,6 +37,7 @@ class taskView(ModelView):
                                                     dict_=dict((hp.slug, hp.val) for hp in list(task.hyper_params))) if len(list(task.hyper_params))>0 else None,
             "Latest Metrics":self.render_template("dict_table.html",
                                                   dict_=dict((mt.slug, mt.val) for mt in list(task.metrics)))if len(list(task.metrics))>0 else None,
+            "Trains":"".join(list(t.train_panel for t in list(task.trains))) if len(task.trains)>0 else "No Training Yet",
         }
         return self.render_template("task_show.html", task=task, intro=intro_dict)
 
