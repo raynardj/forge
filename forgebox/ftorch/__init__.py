@@ -20,6 +20,9 @@ class FG(forgedb):
             df = recorddf(record)
             des = df.describe().loc[adapt, :]
             metric_dict = dict()
+            # todo add epoch column and save epoch
+            des = des.drop("epoch", axis=1)
+            des = des.drop("iter", axis=1)
             for col in des.columns:
                 des.apply(lambda x: metric_dict.update({"%s_%s" % (x.name, col): x[col]}), axis=1)
             if self.verbose:
@@ -55,17 +58,20 @@ class FG(forgedb):
 
         return f
 
-    def logs(self,train = True):
+    def logs(self, train=True):
         """
         Saving the logs for training validation to csv
         :param train: Bool, True for training, False for validation
         :return: a function, result of the decorator
         """
+
         def f(record, dataset):
             df = recorddf(record)
             epoch = list(df.epoch)[0]
-            path = self.logsdir/("%s_%s.%s.csv"%(self.task, self.train.id if train else "val.%s"%(self.train.id),epoch))
+            path = self.logsdir / (
+                        "%s_%s.%s.csv" % (self.task, self.train.id if train else "val.%s" % (self.train.id), epoch))
             path = str(path)
-            df.to_csv(path, index = False)
+            df.to_csv(path, index=False)
             self.log_record(path)
+
         return f
