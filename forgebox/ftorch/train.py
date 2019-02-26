@@ -14,7 +14,7 @@ if JUPYTER:from tqdm import tqdm_notebook as tn
 
 class Trainer:
     def __init__(self, dataset, val_dataset=None, batch_size=16, fg = None,
-                 print_on=20, fields=None, is_log=True, shuffle=True,
+                 print_on=20, fields=None, is_log=True, shuffle=True,num_workers = 4,
                  conn=None, modelName="model", tryName="try", callbacks = [], val_callbacks = []):
         """
         Pytorch trainer
@@ -58,7 +58,7 @@ class Trainer:
         self.fg = fg
         self.modelName = modelName
         self.tryName = tryName
-        self.train_data = DataLoader(self.dataset, batch_size=self.batch_size, shuffle=shuffle)
+        self.train_data = DataLoader(self.dataset, batch_size=self.batch_size, shuffle=shuffle, num_workers = num_workers)
         self.train_len = len(self.train_data)
         self.val_dataset = val_dataset
         self.print_on = print_on
@@ -68,7 +68,7 @@ class Trainer:
 
         if self.val_dataset:
             self.val_dataset = val_dataset
-            self.val_data = DataLoader(self.val_dataset, batch_size=self.batch_size, shuffle=shuffle)
+            self.val_data = DataLoader(self.val_dataset, batch_size=self.batch_size, shuffle=shuffle, num_workers = num_workers)
             self.val_len = len(self.val_data)
             self.val_track = dict()
 
