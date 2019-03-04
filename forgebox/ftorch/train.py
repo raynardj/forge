@@ -5,17 +5,19 @@ from torch.utils.data import DataLoader
 from tqdm import trange
 from functools import reduce
 import pandas as pd
+
 try:
     JUPYTER = True if main.get_ipython else False
 except:
     JUPYTER = False
 
-if JUPYTER:from tqdm import tqdm_notebook as tn
+if JUPYTER: from tqdm import tqdm_notebook as tn
+
 
 class Trainer:
-    def __init__(self, dataset, val_dataset=None, batch_size=16, fg = None,
-                 print_on=20, fields=None, is_log=True, shuffle=True,num_workers = 4,
-                 conn=None, modelName="model", tryName="try", callbacks = [], val_callbacks = []):
+    def __init__(self, dataset, val_dataset=None, batch_size=16, fg=None,
+                 print_on=20, fields=None, is_log=True, shuffle=True, num_workers=4,
+                 conn=None, modelName="model", tryName="try", callbacks=[], val_callbacks=[]):
         """
         Pytorch trainer
         fields: the fields you choose to print out
@@ -58,7 +60,7 @@ class Trainer:
         self.fg = fg
         self.modelName = modelName
         self.tryName = tryName
-        self.train_data = DataLoader(self.dataset, batch_size=self.batch_size, shuffle=shuffle, num_workers = num_workers)
+        self.train_data = DataLoader(self.dataset, batch_size=self.batch_size, shuffle=shuffle, num_workers=num_workers)
         self.train_len = len(self.train_data)
         self.val_dataset = val_dataset
         self.print_on = print_on
@@ -68,7 +70,8 @@ class Trainer:
 
         if self.val_dataset:
             self.val_dataset = val_dataset
-            self.val_data = DataLoader(self.val_dataset, batch_size=self.batch_size, shuffle=shuffle, num_workers = num_workers)
+            self.val_data = DataLoader(self.val_dataset, batch_size=self.batch_size, shuffle=shuffle,
+                                       num_workers=num_workers)
             self.val_len = len(self.val_data)
             self.val_track = dict()
 
@@ -129,7 +132,7 @@ class Trainer:
             if i % self.print_on == self.print_on - 1:
                 self.update_descrition(epoch, i, t)
         for cb_func in self.callbacks:
-            cb_func(record = self.track[epoch],dataset = self.dataset, )
+            cb_func(record=self.track[epoch], dataset=self.dataset, )
 
         if self.val_dataset:
 
@@ -149,7 +152,7 @@ class Trainer:
                 self.update_descrition_val(epoch, i, val_t)
 
             for v_cb_func in self.val_callbacks:
-                v_cb_func(record = self.val_track[epoch],dataset = self.val_dataset, )
+                v_cb_func(record=self.val_track[epoch], dataset=self.val_dataset, )
 
     def update_descrition(self, epoch, i, t):
         window_df = pd.DataFrame(self.track[epoch][max(i - self.print_on, 0):i])
@@ -201,24 +204,26 @@ class Trainer:
 
         return pd.DataFrame(tracks)
 
-    # def save_track(self, filepath, val_filepath=None):
-    #     """
-    #     Save the track to csv files in a path you designated,
-    #     :param filepath: a file path ended with .csv
-    #     :return: None
-    #     """
-    #     self.todataframe(self.track).to_csv(filepath, index=False)
-    #     if val_filepath:
-    #         self.todataframe(self.val_track).to_csv(val_filepath, index=False)
+    def step_train(self, f):
+        """
+        A decorator: @trainer.step_train, following the training step function
+        :param f:
+        :return:
+        """
+        def wraper(*args, **kwargs):
+            return f(*args, **kwargs)
 
-    def step_train(self,f):
-        def wraper(*args,**kwargs):
-            return f(*args,**kwargs)
         self.action = wraper
         return wraper
 
-    def step_val(self,f):
-        def wraper(*args,**kwargs):
-            return f(*args,**kwargs)
+    def step_val(self, f):
+        """
+        A decorator: @trainer.step_val, following the validation step function
+        :param f:
+        :return:
+        """
+        def wraper(*args, **kwargs):
+            return f(*args, **kwargs)
+
         self.val_action = wraper
         return wraper
