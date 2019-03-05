@@ -205,6 +205,7 @@ class Trainer:
         return pd.DataFrame(tracks)
 
     def step_train(self, f):
+
         """
         A decorator: @trainer.step_train, following the training step function
         :param f:

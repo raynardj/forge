@@ -15,7 +15,6 @@ class FG(forgedb):
         return a function to save metrics
         :param adapt: list, default ["mean"], possible values:"mean","min","max","std","20%","50%","70%"
         """
-
         def func(record, dataset):
             df = recorddf(record)
             des = df.describe().loc[adapt, :]
@@ -45,7 +44,7 @@ class FG(forgedb):
         name_ = name
         if name_ == None:
             name_ = self.new_model_name()
-        else:  # todo: add a regex to validate a consequtive sting
+        else:  # todo: add a regex to validate a consequtive string
             name_ = "%s_%s" % (self.train.id, name_)
 
         def f(record, dataset):
@@ -64,7 +63,6 @@ class FG(forgedb):
         :param train: Bool, True for training, False for validation
         :return: a function, result of the decorator
         """
-
         def f(record, dataset):
             df = recorddf(record)
             epoch = list(df.epoch)[0]
