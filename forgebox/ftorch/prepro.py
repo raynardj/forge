@@ -1,4 +1,4 @@
-from torch.utils.data import Dataset
+from torch.utils.data import Dataset,DataLoader
 import math,os
 import torch
 import pandas as pd
@@ -523,3 +523,16 @@ class mapper:
         except:
             return self.old_default
 
+class test_DS:
+    def __init__(self, dataset):
+        """
+        pytorch dataset
+        dt = test_DS(you_dataset)
+        dt() to return the sample
+        :param dataset:
+        """
+        self.dl = DataLoader(dataset)
+        self.iter = iter(self.dl)
+
+    def __call__(self):
+        return next(self.iter)
