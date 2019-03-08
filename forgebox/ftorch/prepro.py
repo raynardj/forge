@@ -523,11 +523,11 @@ class mapper:
         except:
             return self.old_default
 
-class DS_test:
+class test_DS:
     def __init__(self, dataset):
         """
         pytorch dataset
-        dt = DS_test(you_dataset)
+        dt = test_DS(you_dataset)
         dt() to return the sample
         :param dataset:
         """
