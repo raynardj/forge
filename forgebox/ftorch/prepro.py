@@ -325,7 +325,15 @@ class categorical(col_core):
 
 
 class categorical_idx(col_core):
+    """
+    preprocessor
+    """
     def __init__(self, col_name, save_dir=".matchbox/fields"):
+        """
+        column name
+        :param col_name: str,column name
+        :param save_dir: str, the place to save metadata, default .matchbox/fields
+        """
         super(categorical_idx, self).__init__(col_name, save_dir)
         self.coltype = "categorical_idx"
         self.dim_names = [self.col_name]
