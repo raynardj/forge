@@ -314,10 +314,10 @@ class categorical(col_core):
     def prepro_idx(self, pandas_s):
         return pandas_s.apply(self.trans2idx)
 
-    def prepro(self, pandas_s, expand=True):
+    def prepro(self, pandas_s, expand=False):
         return self.eye[self.prepro_idx(pandas_s).values.astype(int)]
 
-    def __call__(self, pandas_s, expand=True):
+    def __call__(self, pandas_s, expand=False):
         return self.eye[self.prepro_idx(pandas_s).values.astype(int)]
 
     def dataset(self, df, bs,shuffle):
