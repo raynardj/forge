@@ -174,3 +174,59 @@ class DeepMaskAttLSTM(nn.Module):
         output, (h_n, c_n) = self.lstm(x)
         output = mask.bmm(output)
         output = output.squeeze(1)  # output shape (bs, hidden_size)
+
+
+class MaskMakers(nn.Module):
+    def __init__(self, hidden_size, nb_masks, act="sigmoid"):
+        """
+        nb_masks: number of masks
+        act: str, default "sigmoid", can be one of "softmax","sigmoid","relu","tanh"
+        x for forward: (bs,seq_len, hidden_size)
+        each mask in shape (bs,seq_len,1)
+        """
+        super().__init__()
+        if act == "softmax":
+            act_layer = nn.Softmax(dim=1)
+        elif act == "sigmoid":
+            act_layer = nn.Sigmoid()
+        elif act == "relu":
+            act_layer = nn.ReLU()
+        elif act == "tanh":
+            act_layer = nn.Tanh()
+
+        self.nb_masks = nb_masks
+        list(
+            setattr(self, "attn_masker_%s" % (_), nn.Sequential(*[nn.Linear(hidden_size, 1, bias=True), act_layer])) for
+            _ in range(nb_masks))
+
+    def forward(self, x):
+        return tuple(getattr(self, "attn_masker_%s" % (_))(x) for _ in range(self.nb_masks))
+
+
+class MultiMaskLSTM(nn.Module):
+    def __init__(self, vocab_size, hidden_size, num_layers=1, nb_masks=1):
+        """
+        seq_len: sequence length
+        return outputs, masks:
+        * outputs: a tuple of outputs, size (bs, hidden_size)
+        * masks: a tuple of masks, size(bs,seq_len,1)
+        """
+        super().__init__()
+        self.hidden_size = hidden_size
+        self.num_layers = num_layers
+        self.nb_masks = nb_masks
+
+        self.emb = nn.Embedding(vocab_size, hidden_size, )
+        self.lstm = nn.LSTM(hidden_size, hidden_size, batch_first=True, num_layers=num_layers)
+        self.makers = MaskMakers(hidden_size, nb_masks=nb_masks)
+
+    def forward(self, x_input):
+        embedded = self.emb(x_input)
+        masks = self.makers(embedded)
+
+        output, (h, c) = self.lstm(embedded)
+        output = output.permute(0, 2, 1)
+
+        outputs = tuple(output.bmm(mask).squeeze(-1) for mask in masks)
+
+        return outputs, masks
