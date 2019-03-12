@@ -365,12 +365,12 @@ class categorical_idx(col_core):
         except:
             return self.cate2idx["_other"]
 
-    def prepro(self, pandas_s, expand=False):
+    def prepro(self, pandas_s, expand=True):
         x = pandas_s.apply(self.trans2idx).values
         if expand: x = np.expand_dims(x, -1)
         return x
 
-    def __call__(self, pandas_s, expand=False):
+    def __call__(self, pandas_s, expand=True):
         return self.prepro(pandas_s,expand)
 
     def dataset(self, df, bs,shuffle):
@@ -410,12 +410,12 @@ class minmax(col_core):
         print("min_:%.3f \tmax_:%.3f\t range:%.3f" % (self.min_, self.max_, self.range))
         self.make_meta()
 
-    def prepro(self, data, expand=False):
+    def prepro(self, data, expand=True):
         x = (np.clip(data.values.astype(np.float64), self.min_, self.max_) - self.min_) / self.range
         if expand: x = np.expand_dims(x, -1)
         return x
 
-    def __call__(self, data,expand=False):
+    def __call__(self, data,expand=True):
         return self.prepro(data,expand)
 
     def dataset(self, df, bs,shuffle):
@@ -487,7 +487,7 @@ class tabulate(col_core):
             if v["coltype"] == "tabulate":
                 data_list.append(col.prepro(data))
             else:
-                data_list.append(col.prepro(data[k], expand=True))
+                data_list.append(col.prepro(data[k]))
         return np.concatenate(data_list, axis=1)
 
     def __call__(self, data):
