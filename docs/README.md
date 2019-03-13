@@ -25,7 +25,7 @@ Run the following under the proper environment
 
 ### The Web UI
 
-Forge offers a [Web UI solution](forge/README.md) for administrative purpose, cleaning up your AI tasks.
+Forge offers a [Web UI solution](web.md) for administrative purpose, cleaning up your AI tasks.
 ![weight management page](img/intro_002.png)
 
 
