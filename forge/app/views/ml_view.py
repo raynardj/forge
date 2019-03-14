@@ -41,7 +41,7 @@ class taskView(ModelView):
         }
         return self.render_template("task_show.html", task=task, intro=intro_dict)
 
-    # todo: A more fancy task show page
+    # todo: scale down the fancy task show page, put up a train page
 
 
 class formatView(ModelView):
@@ -66,9 +66,6 @@ class trainView(ModelView):
     edit_columns = ["task", "name", "remark"]
     show_columns = ["id", "task", "name", "remark", *tscol]
     list_columns = ["id", "task", "name", "remark", *tscol]
-
-    # todo: A more fancy task show page
-
 
 class hyperParamView(ModelView):
     route_base = "/hp"
