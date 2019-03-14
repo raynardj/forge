@@ -236,3 +236,7 @@ class forgedb(object):
         self.s.commit()
         if self.verbose: print("[log saved to]:%s" % (path), flush=True)
         return l
+
+
+    # todo: download/export a task's hyperparam/ weights path to a json
+    # todo: reading the config json for weight path and hyperparams
