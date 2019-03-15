@@ -61,9 +61,8 @@ class forgedb(object):
         """
         return self.s.query(hyperParam).filter(hyperParam.task_id == self.task.id).all()
 
-    def hp2dict(self, ):
+    def hp2dict(self,):
         """
-
         :return: hplist, hpdict
         """
         hplist = self.get_hyperparams()
@@ -237,6 +236,11 @@ class forgedb(object):
         if self.verbose: print("[log saved to]:%s" % (path), flush=True)
         return l
 
-
-    # todo: download/export a task's hyperparam/ weights path to a json
-    # todo: reading the config json for weight path and hyperparams
+    def savejson(self, path = None):
+        hplist, hpdict = self.hp2dict()
+        conf_dict = dict({"hp":hpdict, "taskname":self.task.taskname})
+        if path == None:
+            path = str(self.taskdir/str("conf_%s_%s.json"%(self.task.taskname, datetime.now().timestamp())))
+        with open(path, 'w') as outfile:
+            json.dump(conf_dict, outfile)
+        print("configuration saved to %s"%(path))
