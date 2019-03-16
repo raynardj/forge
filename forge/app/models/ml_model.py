@@ -57,9 +57,9 @@ class trainModel(tsMixin, Model):
     def __repr__(self):
         return "[trn:%s]task:%s" % (self.name, self.task.taskname)
 
-    @property
-    def train_panel(self):
-        return render_template("train_panel.html", train=self)
+    # @property
+    # def train_panel(self):
+    #     return render_template("train_panel.html", train=self)
 
 
 class hyperParam(tsMixin, Model):
