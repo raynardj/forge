@@ -567,14 +567,15 @@ class mapper:
             return self.old_default
 
 class test_DS:
-    def __init__(self, dataset):
+    def __init__(self, dataset, **kwargs):
         """
         pytorch dataset
-        dt = test_DS(you_dataset)
+        dt = test_DS(your_dataset, **kwargs)
+        kwargs are the key word args for dataloader
         dt() to return the sample
         :param dataset:
         """
-        self.dl = DataLoader(dataset)
+        self.dl = DataLoader(dataset, **kwargs)
         self.iter = iter(self.dl)
 
     def __call__(self):
