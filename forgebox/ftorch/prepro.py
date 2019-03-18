@@ -567,7 +567,7 @@ class mapper:
             return self.old_default
 
 class test_DS:
-    def __init__(self, dataset, **kwargs):
+    def __init__(self, dataset, *args, **kwargs):
         """
         pytorch dataset
         dt = test_DS(your_dataset, **kwargs)
