@@ -100,8 +100,7 @@ class Seq_Dataset(Dataset):
         self.vocab_size = int(vocab_size)
 
         self.bs = bs
-        self.N = len(self.seq)
-        self.BN = math.ceil(self.N / self.bs)
+        self.calc_bn()
         print(seqname, "sequence total_length type:", self.N)
 
         self.sep_tok = sep_tok if sep_tok != None else ""
@@ -125,6 +124,15 @@ class Seq_Dataset(Dataset):
         self.make_totorch()
 
     def __len__(self):
+        return self.BN
+
+    def calc_bn(self):
+        """
+        calculate batch numbers
+        :return: batch numbers
+        """
+        self.N = len(self.seq)
+        self.BN = math.ceil(self.N / self.bs)
         return self.BN
 
     def __getitem__(self, idx):
