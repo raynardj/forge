@@ -6,7 +6,7 @@ from ..config import SQLALCHEMY_DATABASE_URI
 Base = automap_base()
 
 engine = create_engine(SQLALCHEMY_DATABASE_URI)
-
+print("[Connecting to] %s"%(SQLALCHEMY_DATABASE_URI))
 Base.prepare(engine, reflect=True)
 
 session = Session(engine)
