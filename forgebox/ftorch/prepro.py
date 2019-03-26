@@ -83,7 +83,7 @@ class Seq_Dataset(Dataset):
 
     def __init__(self,
                  seqname, seq, seq_len=None, vocab_path=None,
-                 bs=16, vocab_size=10000, build_vocab=False, sep_tok="<tok>", discard_side="right", element_type="int"):
+                 bs=16, vocab_size=10000, build_vocab=False, sep_tok="<tok>", discard_side="right", element_type="int", fixlen=False):
         '''
         A pytorch dataset for sequence
         seq: enumerable sequence
@@ -120,6 +120,8 @@ class Seq_Dataset(Dataset):
                 self.vocab = pd.read_json(self.vocab_path)
             self.char2idx, self.idx2char = self.get_mapping(self.vocab)
             self.make_translate()
+        if fixlen:
+            self.process_batch = self.process_batch_fixlen
         self.element_type = element_type
         self.make_totorch()
 
@@ -179,6 +181,13 @@ class Seq_Dataset(Dataset):
 
     def process_batch(self, batch):
         return torch.nn.utils.rnn.pad_sequence(np.vectorize(self.seq2idx, otypes=[list])(batch), batch_first=True)
+
+    def process_batch_fixlen(self, batch):
+        return torch.nn.utils.rnn.pad_sequence(np.vectorize(self.seq2idx, otypes=[list])(batch+[self.dummy_input()]), batch_first=True)[:-1,...]
+
+    def dummy_input(self,):
+        dummy = self.sep_tok.join([" "]*self.seq_len)
+        return dummy
 
     def seq2idx(self, x):
         for f in self.process_funcs: x = f(self, x)
