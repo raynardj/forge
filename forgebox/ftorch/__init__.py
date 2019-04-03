@@ -19,6 +19,8 @@ class FG(forgedb):
             df = recorddf(record)
             des = df.describe().loc[adapt, :]
             metric_dict = dict()
+
+            epoch_now = list(df.epoch)[-1]
             # todo add epoch column and save epoch
             des = des.drop("epoch", axis=1)
             des = des.drop("iter", axis=1)
@@ -26,7 +28,7 @@ class FG(forgedb):
                 des.apply(lambda x: metric_dict.update({"%s_%s" % (x.name, col): x[col]}), axis=1)
             if self.verbose:
                 print(metric_dict, flush=True)
-            self.save_metrics(metrics=metric_dict)
+            self.save_metrics(metrics=metric_dict, epoch = epoch_now)
             return metric_dict
 
         return func

@@ -48,6 +48,7 @@ class forgedb(object):
         self.format("str", "String Format")
 
         self.set_hp_attributes()
+        self.nb_trains = 0
         self.new_train()
         self.modelnow = self.new_model_name()
 
@@ -61,7 +62,7 @@ class forgedb(object):
         """
         return self.s.query(hyperParam).filter(hyperParam.task_id == self.task.id).all()
 
-    def hp2dict(self,):
+    def hp2dict(self, ):
         """
         :return: hplist, hpdict
         """
@@ -122,6 +123,7 @@ class forgedb(object):
         self.s.add(train)
         self.s.commit()
         self.train = train
+        self.nb_trains += 1
         return train
 
     def format(self, name, remark=None):
@@ -133,7 +135,7 @@ class forgedb(object):
         """
         fmt = self.s.query(dataFormat).filter(dataFormat.name == name).first()
         if fmt == None:
-            fmt = dataFormat(name=name, remark=remark, **tsDict)
+            fmt = dataFormat(name=name, remark=remark, )
             self.s.add(fmt)
             self.s.commit()
             print("[creating format :%s] for 1st and last time" % (name), flush=True)
@@ -160,7 +162,7 @@ class forgedb(object):
         hplist, hpdict = self.hp2dict()
         if framewk:
             self.framewk = framewk
-        mn = modelname if modelname else self.modelnow
+        mn = modelname if modelname else self.new_model_name()
         w = weightModel(task_id=self.task.id, name=mn,
                         path=str(path), framewk=self.framewk, train_id=self.train.id,
                         params_json=json.dumps(hpdict),
@@ -173,7 +175,7 @@ class forgedb(object):
     def m_(self, key, val, big_better=True,
            remark=None, ):
         """
-        recording the metrics
+        Saving the metrics, create/ update metric value
         key: metric name
         val: metric value
         """
@@ -196,25 +198,25 @@ class forgedb(object):
 
         return mt
 
-    def m(self, key, val, big_better=True,
+    def m(self, key, val, epoch=0, big_better=True,
           remark=None, ):
         """
-        recording the metrics
+        Saving the metrics, with the logs
         key: metric name
         val: metric value
-        weight: weight object, if None, using the latest weight in task
+        big_better, is this metric the bigger the better (for the model)
         """
         # Saving the current metric
-        mt = self.m_(key, val, big_better, remark)  # update or new
+        mt = self.m_(key, val, big_better=big_better, remark=remark)  # update or new
         self.s.add(mt)
         self.s.commit()
         # Saving the metric log
-        mlog = metricLog(metric_id=mt.id, train_id=self.train.id, valsnap=str(val), **tsDict)
+        mlog = metricLog(metric_id=mt.id, train_id=self.train.id, epoch=epoch, valsnap=str(val), **tsDict)
         self.s.add(mlog)
         self.s.commit()
         return mt
 
-    def save_metrics(self, metrics, small_list=None):  # todo improve small list
+    def save_metrics(self, metrics, epoch=0, small_list=None):  # todo improve small list
         """
         saving a dictionary of metrics
         :param metrics: dictionary
@@ -224,7 +226,7 @@ class forgedb(object):
         if small_list == None: small_list = []
         mtlist = []
         for k, v in metrics.items():
-            kwa = dict({"key": k, "val": v, })
+            kwa = dict({"key": k, "val": v, "epoch": epoch, })
             if k in small_list:
                 kwa.update({"big_better": False})
             self.m(**kwa, )
@@ -236,11 +238,11 @@ class forgedb(object):
         if self.verbose: print("[log saved to]:%s" % (path), flush=True)
         return l
 
-    def savejson(self, path = None):
+    def savejson(self, path=None):
         hplist, hpdict = self.hp2dict()
-        conf_dict = dict({"hp":hpdict, "taskname":self.task.taskname})
+        conf_dict = dict({"hp": hpdict, "taskname": self.task.taskname})
         if path == None:
-            path = str(self.taskdir/str("conf_%s_%s.json"%(self.task.taskname, datetime.now().timestamp())))
+            path = str(self.taskdir / str("conf_%s_%s.json" % (self.task.taskname, datetime.now().timestamp())))
         with open(path, 'w') as outfile:
             json.dump(conf_dict, outfile)
-        print("configuration saved to %s"%(path))
+        print("configuration saved to %s" % (path))

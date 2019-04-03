@@ -1,6 +1,7 @@
 {%from "dict_table.html" import dict_table%}
+{%from "color_mod.html" import color_mod%}
 {%macro train_panel(train)%}
-<div class="panel panel-primary">
+<div class="panel panel-primary" id="train_panel_{{train.id}}">
     <div class="panel-body">
         {{train.name}}
     </div>
@@ -22,7 +23,7 @@
                 <th>Metrics</th>
                 <td>
                     {% for l in train.metrics %}
-                    <div class="btn btn-default">{{l.metric.slug}}<span class="badge">{{l.valsnap}}</span></div>
+                    <div class="btn btn-default">{{l.metric.slug}}[ep{{l.epoch}}]<span class="label label-{{color_mod(l.epoch|int)}}">{{l.valsnap|float}}</span></div>
                     {% endfor %}
                 </td>
             </tr>
