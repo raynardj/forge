@@ -21,7 +21,6 @@ class FG(forgedb):
             metric_dict = dict()
 
             epoch_now = list(df.epoch)[-1]
-            # todo add epoch column and save epoch
             des = des.drop("epoch", axis=1)
             des = des.drop("iter", axis=1)
             for col in des.columns:
