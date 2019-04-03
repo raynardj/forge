@@ -31,6 +31,8 @@ Forge offers a [Web UI solution](web.md) for administrative purpose, cleaning up
 
 ### Python code API
 
+forgebox is the code API tool box, check forgebox [tutorial](tutorial.md) based on titanic dataset
+
 ```forgebox``` is a [python api](forgebox/README.md) that you can add to your python script or jupyter notebook cell. You can train your model happily in the way you like, with very limited addition to your original code.
 Then your training trial can be read/checked/reviewed on a clean shaved Web interface.
 
