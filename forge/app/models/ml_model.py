@@ -57,9 +57,9 @@ class trainModel(tsMixin, Model):
     def __repr__(self):
         return "[trn:%s]task:%s" % (self.name, self.task.taskname)
 
-    # @property
-    # def train_panel(self):
-    #     return render_template("train_panel.html", train=self)
+    @property
+    def train_panel(self):
+        return render_template("train_panel.html", train=self)
 
 
 class hyperParam(tsMixin, Model):
@@ -154,6 +154,7 @@ class metricLog(tsMixin, Model):
     task = db.relationship(taskModel)
     train_id = db.Column(db.Integer, db.ForeignKey(trainModel.id))
     train = db.relationship(trainModel, foreign_keys=[train_id], backref="metrics")
+    epoch = db.Column(db.Integer, default = 0)
     valsnap = db.Column(db.String(255), nullable=True)  # snapshot of hyper param value
 
     def __repr__(self):

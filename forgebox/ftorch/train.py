@@ -86,6 +86,9 @@ class Trainer:
         """
         Train the model for some epochs
         """
+        if self.fg:
+            self.fg.new_train()
+
         if name == None:
             name = "torch_train_" + datetime.now().strftime("%y%m%d_%H%M%S")
         if log_addr == None:
@@ -99,16 +102,13 @@ class Trainer:
         if self.is_log:
             os.system("mkdir -p %s" % (log_addr))
             trn_track = pd.DataFrame(reduce((lambda x, y: x + y), list(self.track.values())))
-            trn_track = trn_track.to_csv(log_addr + "trn_" + datetime.now().strftime("%y_%m_%d__%H_%M_%S") + ".csv",
+            trn_track.to_csv(log_addr + "trn_" + datetime.now().strftime("%y_%m_%d__%H_%M_%S") + ".csv",
                                          index=False)
 
             if self.val_dataset:
                 val_track = pd.DataFrame(reduce((lambda x, y: x + y), list(self.val_track.values())))
                 val_track.to_csv(log_addr + "val_" + datetime.now().strftime("%y_%m_%d__%H_%M_%S") + ".csv",
                                  index=False)
-
-        if self.fg:
-            return self.fg.new_train()
 
     def run(self, epoch):
         """
