@@ -233,9 +233,23 @@ class MultiMaskLSTM(nn.Module):
 
 class GELU(nn.Module):
     """
-    Paper Section 3.4, last paragraph notice that BERT used the GELU instead of RELU
+    GELU activation instead of RELU
     <iframe src="https://www.desmos.com/calculator/fgpckn1i1m?embed" width="500px" height="500px" style="border: 1px solid #ccc" frameborder=0></iframe>
     """
 
     def forward(self, x):
         return 0.5 * x * (1 + torch.tanh(math.sqrt(2 / math.pi) * (x + 0.044715 * torch.pow(x, 3))))
+
+class LayerNorm(nn.Module):
+    "Construct a layernorm module"
+
+    def __init__(self, features, eps=1e-6):
+        super(LayerNorm, self).__init__()
+        self.a_2 = nn.Parameter(torch.ones(features))
+        self.b_2 = nn.Parameter(torch.zeros(features))
+        self.eps = eps
+
+    def forward(self, x):
+        mean = x.mean(-1, keepdim=True)
+        std = x.std(-1, keepdim=True)
+        return self.a_2 * (x - mean) / (std + self.eps) + self.b_2
