@@ -12,7 +12,7 @@ setup(
     packages = find_packages(),
     include_package_data=True,
     py_modules=['forgebox','forge',],
-    scripts = ['forge/bin/forge'],
+    scripts = ['forge/bin/forge', 'forge/bin/forge_db',],
     # package_data={'forge':['./forge/templates/*','./forge/static/*']},
     install_requires = [
         "flask==0.12.4",
