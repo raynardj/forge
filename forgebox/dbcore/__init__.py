@@ -4,8 +4,12 @@ from sqlalchemy import create_engine
 from ..config import SQLALCHEMY_DATABASE_URI
 
 Base = automap_base()
-
-engine = create_engine(SQLALCHEMY_DATABASE_URI)
+try:
+    engine = create_engine(SQLALCHEMY_DATABASE_URI)
+except:
+    print("Create forge.db sqlite database file")
+    from forge.app import db
+    db.create_all()
 
 Base.prepare(engine, reflect=True)
 
