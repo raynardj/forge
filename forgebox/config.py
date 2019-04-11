@@ -1,5 +1,6 @@
 import os
 DATADIR = os.path.expanduser("~/data")
+
 if os.path.isfile("/etc/forgebox.cfg"):
     from configparser import ConfigParser
     config = ConfigParser()
