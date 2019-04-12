@@ -9,7 +9,7 @@ try:
 except:
     import os
     basedir = os.path.abspath(os.path.dirname(__file__))
-    DATADIR = os.path.expanduser("~/data")
+    DATADIR = os.path.expanduser("%s/data"%(os.environ["HOME"]))
     print("Create forge.db sqlite database file")
     from forge.app import db
     db.create_all()
