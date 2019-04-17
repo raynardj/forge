@@ -4,16 +4,19 @@ from sqlalchemy import create_engine
 from ..config import SQLALCHEMY_DATABASE_URI
 
 Base = automap_base()
-try:
-    engine = create_engine(SQLALCHEMY_DATABASE_URI)
-except:
-    import os
-    basedir = os.path.abspath(os.path.dirname(__file__))
-    DATADIR = os.path.expanduser("%s/data"%(os.environ["HOME"]))
-    print("Create forge.db sqlite database file")
+
+import os
+if os.environ["FORGE_DB_INITIALIZED"] != True:
+
+    # basedir = os.path.abspath(os.path.dirname(__file__))
+    # DATADIR = os.path.expanduser("%s/data"%(os.environ["HOME"]))
+
+    print("Initialize forge db")
     from forge.app import db
     db.create_all()
+    os.environ["FORGE_DB_INITIALIZED"] = True
 
+engine = create_engine(SQLALCHEMY_DATABASE_URI)
 Base.prepare(engine, reflect=True)
 
 session = Session(engine)
