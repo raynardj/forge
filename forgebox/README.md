@@ -10,10 +10,6 @@
 SQLALCHEMY_DATABASE_URI = 'sqlite:////mnt/disk1/forge.db')
 ```
 
-## Task Management
-
-You can add a task at the Web UI ```http://[host]:[port]/task/add```
-
 ## Initiate forge api
 
 ```python
@@ -43,7 +39,7 @@ fg.format("str",remark = "String Format")
 For pytorch users, Forge is intergrated into the training framework. Check [ftorch](ftorch) for detail
 
 Tutorial Example for Pytorch User
-### Saving weights
+### Using Trainer form [tracker.py](tracker.py)
 
 ```python
 fg = FG(task = "sentimental_analysis")
@@ -126,3 +122,28 @@ Then train for 5 epochs
 ``` python
 trainer.train(5)
 ```
+
+### Layers
+
+Layers are mostly pytorch modules, examples:
+
+GELU:
+```python
+from forgebox.ftorch.layers import GELU
+
+gelu = GELU()
+x = gelu(x)
+```
+
+A list of layers:
+* activations
+    * GELU
+* cv
+    * Coord2d
+* nlp
+    * Attention
+    * MultiHeadedAttention
+    * TransformerBlock
+* norm
+    * LayerNorm
+    * UnNormalize
