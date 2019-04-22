@@ -126,3 +126,26 @@ class TransformerBlock(nn.Module):
         x = self.input_block(x, lambda _x: self.attention(_x, _x, _x, mask=mask))
         x = self.output_block(x, self.FFN)
         return self.dropout(x)
+
+
+class AttentionLSTM(nn.Module):
+    def __init__(self, input_size, heads=4, num_layers=2, dropout_ratio=0.1):
+        """
+        input size: int,  input size, also the hidden size for RNN
+        heads, int=4, heads of the Attention(the extra dimension space for attention)
+        num_layers: int= 2.
+        dropout_ratio: flaot= 0.1
+        """
+        super().__init__()
+        self.attention = MultiHeadedAttention(heads, d_model=input_size, dropout_ratio=dropout_ratio)
+        self.rnn = nn.LSTM(input_size=input_size,
+                           hidden_size=input_size,
+                           num_layers=num_layers,
+                           batch_first=True)
+
+    def forward(self, x, mask=None):
+        x1 = self.attention(x, x, self.rnn(x)[0], mask)
+        xr = x.flip(dims=[1])
+        x2 = self.attention(xr, xr, self.rnn(xr)[0], mask)
+        x = torch.cat([x1[:, -1, :], x2[:, -1, :]], dim=1)
+        return x
