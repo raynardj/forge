@@ -135,6 +135,8 @@ class AttentionLSTM(nn.Module):
         heads, int=4, heads of the Attention(the extra dimension space for attention)
         num_layers: int= 2.
         dropout_ratio: flaot= 0.1
+
+        return: torch.FloatTensor, in size(batch_size,input_size*2)
         """
         super().__init__()
         self.attention = MultiHeadedAttention(heads, d_model=input_size, dropout_ratio=dropout_ratio)
