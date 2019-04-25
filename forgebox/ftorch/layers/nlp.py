@@ -111,6 +111,15 @@ class TransformerBlock(nn.Module):
     """
     Bidirectional Encoder  = Transformer(self-attention)
     Transformer = MultiHead_Attention + Feed Forward with sublayer connection
+
+    hidden: int, hidden size
+    attn_heads: int heads nubmer of attention layers (number of attentions)
+    feed_forward_hidden: int, usually, set it to 4* of the hidden
+    dropout_ratio: float
+
+    forward:
+    input: x, mask
+    return: torch.FloatTensor: same as input x (BS, seq_len, hidden)
     """
 
     def __init__(self, hidden, attn_heads, feed_forward_hidden, dropout_ratio):
