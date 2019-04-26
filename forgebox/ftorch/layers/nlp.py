@@ -11,7 +11,7 @@ class SublayerConnection(nn.Module):
         """
         A residual connection followed by a layer norm
         size: feature number, for layer norm
-        dropout_ratio:
+        dropout_ratio: float
         """
         super(SublayerConnection ,self).__init__()
         self.norm = LayerNorm(size)
@@ -28,6 +28,17 @@ class SublayerConnection(nn.Module):
 class Attention(nn.Module):
     """
     Compute "Scaled Dot Product Attention"
+    Only contains the forward pass, no modelweights
+
+    forward args:
+    query: torch.FloatTensor
+    key: torch.FloatTensor, same size() as query
+    value: torch.FloatTensor, same size() as query
+    forward kwargs:
+    mask: default None
+    dropout: float, default None
+
+    return x, p_attn
     """
 
     def forward(self, query, key, value, mask=None, dropout=None):
