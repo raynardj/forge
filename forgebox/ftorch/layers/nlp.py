@@ -77,6 +77,12 @@ class MultiHeadedAttention(nn.Module):
         self.dropout = nn.Dropout(dropout_ratio)
 
     def forward(self, query, key, value, mask=None):
+        """
+
+        :param query,key,value: torch.FloatTensor in same shape
+        :param mask: optional, default None
+        :return: same size torch.FloatTensor like query, key, or value
+        """
         bs = query.size(0)
         # Linear Project in batch from d_model => h,seq_len,d_k
         query = self.linear_project(self.linear_q, query)
