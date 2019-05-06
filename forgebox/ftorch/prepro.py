@@ -596,4 +596,8 @@ class test_DS:
         self.iter = iter(self.dl)
 
     def __call__(self):
+        """
+        returns data with iterator
+        :return:data
+        """
         return next(self.iter)
