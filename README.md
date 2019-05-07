@@ -42,4 +42,4 @@ Ask yourself have you encountered the following:
 * Hmmmm.... what hyper-parameter did I change for last epoch?
 * I increased this h-param to 64, which yields the F1 score 0.879, wait... what was my F1 before this?
 * I'm putting my model to production, I clearly remember the model weight ```nlp_binary_cls-v0.2.5.npy``` was my best performer, but what was the activation function for its attention mask again?
-* I think I have a decent translation model by now, I can use it to build an API!... only if I stored that version of word-to-index mapping relationship 2 days ago
+* I think I had a decent translation model in one of those trying, I can use it to build an API!... only if I stored that version of word-to-index mapping relationship 2 days ago
