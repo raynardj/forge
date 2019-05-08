@@ -34,14 +34,17 @@ class Attention(nn.Module):
     query: torch.FloatTensor
     key: torch.FloatTensor, same size() as query
     value: torch.FloatTensor, same size() as query
-    forward kwargs:
-    mask: default None
-    dropout: float, default None
 
-    return x, p_attn
     """
 
     def forward(self, query, key, value, mask=None, dropout=None):
+        """
+        forward kwargs:
+        mask: default None
+        dropout: float, default None
+
+        return x, p_attn
+        """
         scores = torch.matmul(query, key.transpose(-2, -1)) \
                  / math.sqrt(query.size(-1))  # regulize the scale down
 
