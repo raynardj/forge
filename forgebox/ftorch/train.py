@@ -5,6 +5,7 @@ from torch.utils.data import DataLoader
 from tqdm import trange
 from functools import reduce
 import pandas as pd
+from collections import namedtuple
 
 try:
     JUPYTER = True if main.get_ipython else False
@@ -12,6 +13,8 @@ except:
     JUPYTER = False
 
 if JUPYTER: from tqdm import tqdm_notebook as tn
+
+TrainerBatch = namedtuple("TrainerBatch", ("epoch", "i", "data", "trainer"))
 
 
 class Trainer:
@@ -27,9 +30,14 @@ class Trainer:
 
         write action function for a step of training,
         assuming a generator will spit out tuple x,y,z in each:
+        then pass the function to object
 
-        def action(*args,**kwargs):
-            x,y,z = args[0]
+        t=Trainer(...)
+        t.train(epochs = 30)
+
+        @t.step_train
+        def action(batch):
+            x,y,z = batch.data
             x,y,z = x.cuda(),y.cuda(),z.cuda()
 
             #optimizer is a global variable, or many different optimizers if you like
@@ -43,12 +51,6 @@ class Trainer:
             ...... more param updating details here
 
             return {"loss":loss.data[0],"acc":accuracy.data[0]}
-            ...
-
-        then pass the function to object
-        trainer=Trainer(...)
-        trainer.action=action
-        trainer.train(epochs = 30)
 
         same work for validation:trainer.val_action = val_action
 
@@ -103,7 +105,7 @@ class Trainer:
             os.system("mkdir -p %s" % (log_addr))
             trn_track = pd.DataFrame(reduce((lambda x, y: x + y), list(self.track.values())))
             trn_track.to_csv(log_addr + "trn_" + datetime.now().strftime("%y_%m_%d__%H_%M_%S") + ".csv",
-                                         index=False)
+                             index=False)
 
             if self.val_dataset:
                 val_track = pd.DataFrame(reduce((lambda x, y: x + y), list(self.val_track.values())))
@@ -123,7 +125,8 @@ class Trainer:
         self.train_gen = iter(self.train_data)
 
         for i in t:
-            ret = self.action(next(self.train_gen), epoch=epoch, ite=i)
+            batch = TrainerBatch(epoch, i, next(self.train_gen), self)
+            ret = self.action(batch)
             ret.update({"epoch": epoch,
                         "iter": i,
                         "ts": self.get_time()})
@@ -144,7 +147,8 @@ class Trainer:
                 val_t = trange(self.val_len)
 
             for i in val_t:
-                ret = self.val_action(next(self.val_gen), epoch=epoch, ite=i)
+                batch = TrainerBatch(epoch, i, next(self.val_gen), self)
+                ret = self.val_action(batch)
                 ret.update({"epoch": epoch,
                             "iter": i,
                             "ts": self.get_time()})
@@ -211,8 +215,9 @@ class Trainer:
         :param f:
         :return:
         """
-        def wraper(*args, **kwargs):
-            return f(*args, **kwargs)
+
+        def wraper(batch):
+            return f(batch)
 
         self.action = wraper
         return wraper
@@ -223,8 +228,9 @@ class Trainer:
         :param f:
         :return:
         """
-        def wraper(*args, **kwargs):
-            return f(*args, **kwargs)
+
+        def wraper(batch):
+            return f(batch)
 
         self.val_action = wraper
         return wraper
