@@ -40,7 +40,6 @@ class DF_Chunk_Node(DF_Node):
                 pro = self.pipe[pro_i]
                 df = pro.pro(df)
 
-
 class DF_Edge(object):
     def __init__(self, edge_name=None):
         super().__init__()
@@ -65,19 +64,24 @@ class Col_Edge(object):
         if edge_name == None:
             edge_name = "DataSeries_Processing_Edge"
         self.edge_name = edge_name
+        self.cols = []
 
     def __mul__(self, cols):
         self.cols = cols
         return self
 
     def define(self, f):
-        def wraper(df):
-            for col in self.cols:
-                df[col] = f(df[col])
-            return df
+        def wraper(col):
+            col = f(col)
+            return col
 
-        self.pro = wraper
+        self.colpro = wraper
         return wraper
+
+    def pro(self, df):
+        for c in self.cols:
+            df[c] = self.colpro(df[c])
+        return df
 
 
 nothing = DF_Edge("ept_process")
@@ -88,24 +92,3 @@ def donothing(df):
     return df
 
 
-class FillNa_Edge(Col_Edge):
-    def __init__(self, fill=0.):
-        super().__init__("fillna")
-        self.fill = fill
-
-    def pro(self, df):
-        for c in self.cols:
-            df[c] = df[c].fillna(self.fill)
-        return df
-
-
-class EngTok_Edge(Col_Edge):
-    def __init__(self, tokenizer = tweet_tk, max_len=None):
-        super().__init__("En")
-        self.tokenizer = tokenizer
-        self.max_len = max_len
-
-    def pro(self, df):
-        for c in self.cols:
-            df[c] = df[c].apply(lambda x: self.tokenizer.tokenize(x)[:self.max_len])
-        return df
