@@ -278,6 +278,8 @@ What you decide is what will happen, within an iteration, given a batch of data.
 @trainer.step_train
 def action(batch):
     x,y = batch.data
+    if batch.i == 0:
+        model.train()
     x = x.squeeze(0)
     y = y.float()
 
@@ -298,6 +300,8 @@ def action(batch):
 @trainer.step_val
 def val_action(batch):
     x,y = batch.data
+    if batch.i == 0:
+        model.eval()
     x = x.squeeze(0)
     y = y.float()
     y_ = model(x)
