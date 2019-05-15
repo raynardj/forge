@@ -276,8 +276,8 @@ What you decide is what will happen, within an iteration, given a batch of data.
 
 ```python
 @trainer.step_train
-def action(*args,**kwargs):
-    x,y = args[0]
+def action(batch):
+    x,y = batch.data
     x = x.squeeze(0)
     y = y.float()
 
@@ -296,8 +296,8 @@ def action(*args,**kwargs):
     return {"loss":loss.item(),"acc":acc.item(),"rec":rec.item(),"prec":prec.item(),"f1":f1.item()}
 
 @trainer.step_val
-def val_action(*args,**kwargs):
-    x,y = args[0]
+def val_action(batch):
+    x,y = batch.data
     x = x.squeeze(0)
     y = y.float()
     y_ = model(x)
