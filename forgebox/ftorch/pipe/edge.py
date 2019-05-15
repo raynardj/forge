@@ -85,7 +85,7 @@ class TrackVocab(Col_Edge):
 class SaveCSV(DF_Edge):
     """
     DataFrame Edge
-    SaveCsv("")
+    SaveCsv("/path/to/file.csv")
     """
     def __init__(self, csvpath, tocsv_conf={"sep": "\t", "header": False}):
         super().__init__("save to csv")
@@ -94,4 +94,19 @@ class SaveCSV(DF_Edge):
 
     def pro(self, df):
         df.to_csv(self.csvpath, mode="a", **self.tocsv_conf)
+        return df
+
+class SaveSQL(DF_Edge):
+    """
+    DataFrame Edge
+    SaveSQL("table_name", con)
+    """
+    def __init__(self, table_name, con, tosql_conf={"index": False, "if_exists":"append"}):
+        super().__init__("save to sql_table")
+        self.table_name = table_name
+        self.con = con
+        self.tosql_conf = tosql_conf
+
+    def pro(self, df):
+        df.to_sql(self.table_name, con=self.con, **self.tosql_conf)
         return df
