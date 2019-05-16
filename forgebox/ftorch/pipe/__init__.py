@@ -34,11 +34,30 @@ class DF_Chunk_Node(DF_Node):
         super().__init__(df, verbose)
 
     def run(self):
+        """
+        Running iterations on the entire dataset
+        :return: None
+        """
         for df in self.df:
             for pro_i in range(len(self.pipe)):
                 if self.verbose > 0: print("[df edge]:%s" % self.pipenames[pro_i])
                 pro = self.pipe[pro_i]
                 df = pro.pro(df)
+
+    def testrun(self):
+        """
+        testing for 1 iteration
+        :return: the result dataframe
+        """
+        testdf = next(self.df)
+        print("Please restart the generator after running test",flush=True)
+        for pro_i in range(len(self.pipe)):
+            if self.verbose > 0: print("[df edge]:%s" % self.pipenames[pro_i])
+            pro = self.pipe[pro_i]
+            testdf = pro.pro(testdf)
+
+        return testdf
+
 
 class DF_Edge(object):
     def __init__(self, edge_name=None):
