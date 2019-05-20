@@ -12,7 +12,7 @@ Forge is originally created to organize the above chaos with minimal extra codin
 
 Hopefully, this tracking mechanism will evolve to a way offering clearer sense of managing your AI/Learning tasks.
 
-![task management example](img/intro_001.png)
+![task management example](https://github.com/raynardj/forge/tree/master/img/intro_001.png)
 
 ### Installation
 
@@ -23,12 +23,6 @@ Run the following under the proper environment
 (base)$ pip install git+https://github.com/raynardj/forge
 ```
 
-### The Web UI
-
-Forge offers a [Web UI solution](web.md) for administrative purpose, cleaning up your AI tasks.
-![weight management page](img/intro_002.png)
-
-
 ### Python code API
 
 forgebox is the code API tool box, check forgebox [tutorial](tutorial.md) based on titanic dataset
@@ -36,6 +30,12 @@ forgebox is the code API tool box, check forgebox [tutorial](tutorial.md) based 
 ```forgebox``` is a [python api](forgebox/README.md) that you can add to your python script or jupyter notebook cell. You can train your model happily in the way you like, with very limited addition to your original code.
 Then your training trial can be read/checked/reviewed on a clean shaved Web interface.
 
+```pipe``` is for [dataflow pipeline](forgebox/pipe.md), beam style data preprocessing for pandas dataframe and pandas dataframe generator.
+
+### The Web UI
+
+Forge offers a [Web UI solution](web.md) for administrative purpose, cleaning up your AI tasks.
+![weight management page](https://github.com/raynardj/forge/tree/master/img/intro_002.png)
 
 ### Selling points
 
