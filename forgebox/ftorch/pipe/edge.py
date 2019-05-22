@@ -28,7 +28,7 @@ eng_twt_tk = EngTok_Edge(TweetTokenizer())
 
 class CNTok(Col_Edge):
     def __init__(self):
-        super().__self__("chinese_tokenize")
+        super().__init__("chinese_tokenize")
         from jieba import cut
         self.cut = cut
 
