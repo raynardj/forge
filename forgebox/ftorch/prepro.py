@@ -609,12 +609,12 @@ def split_df(df, valid=0.2, ensure_factor = 2 ):
     ensure_factor, ensuring the row number to be the multiplication of this factor, default 2
     return train_df, valid_df
     """
-    split_ = (np.random.rand(len(df))<valid)
+    split_ = (np.random.rand(len(df))>valid)
     train_df = df[split_].sample(frac=1.).reset_index().drop("index",axis=1)
     valid_df = df[~split_].sample(frac=1.).reset_index().drop("index",axis=1)
     if ensure_factor:
-        train_mod = len(train_df)//ensure_factor
-        valid_mod = len(valid_df)//ensure_factor
+        train_mod = len(train_df)%ensure_factor
+        valid_mod = len(valid_df)%ensure_factor
         return train_df[:-train_mod],valid_df[:-valid_mod]
     else:
         return train_df,valid_df
