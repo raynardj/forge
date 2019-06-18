@@ -14,7 +14,7 @@ class FG(forgedb):
         return a function to save metrics
         :param adapt: list, default ["mean"], possible values:"mean","min","max","std","20%","50%","70%"
         """
-        def func(record, dataset):
+        def func(record):
             df = recorddf(record)
             des = df.describe().loc[adapt, :]
             metric_dict = dict()
@@ -47,7 +47,7 @@ class FG(forgedb):
         else:  # todo: add a regex to validate a consequtive string
             name_ = "%s_%s" % (self.train.id, name_)
 
-        def f(record, dataset):
+        def f(record):
             epoch = list(recorddf(record).epoch)[0]
             name_epoch = "%s.e%s" % (name_, epoch)
             path = self.weightdir / ("%s" % (name_epoch if name_epoch[-4:] == ".npy" else "%s.npy" % (name_epoch)))
@@ -63,7 +63,7 @@ class FG(forgedb):
         :param train: Bool, True for training, False for validation
         :return: a function, result of the decorator
         """
-        def f(record, dataset):
+        def f(record):
             df = recorddf(record)
             epoch = list(df.epoch)[0]
             path = self.logsdir / (

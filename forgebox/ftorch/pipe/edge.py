@@ -61,7 +61,7 @@ class TrackVocab(Col_Edge):
     """
     def __init__(self):
         super().__init__("track vocab")
-        self.vocab = pd.DataFrame({"token": [], "idx": []})
+        self.vocab = pd.DataFrame({"token": [], "cnt": []})
 
     def colpro(self, col):
         lists = list(col)
@@ -77,11 +77,11 @@ class TrackVocab(Col_Edge):
         ct_dict = self.get_token_count_dict(full_tok)
         tk, ct = list(ct_dict.keys()), list(ct_dict.values())
 
-        return pd.DataFrame({"token": tk, "idx": ct})
+        return pd.DataFrame({"token": tk, "cnt": ct})
 
     def combine_vocab(self, new_vocab):
         combinedf = pd.concat([self.vocab, new_vocab]).groupby("token").sum().reset_index()
-        return combinedf.sort_values(by="idx", ascending=False).reset_index().drop("index", axis=1)
+        return combinedf.sort_values(by="cnt", ascending=False).reset_index().rename(columns = {"index":"idx"})
 
     def save_vocab(self, json_url):
         self.vocab.to_json(json_url)
