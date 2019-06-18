@@ -28,6 +28,11 @@ eng_twt_tk = EngTok_Edge(TweetTokenizer())
 
 class CNTok(Col_Edge):
     def __init__(self):
+        """
+        cntok = CNTok()
+        datanode = start_node|cntok*["col1","col2"]
+        datanode.run()
+        """
         super().__init__("chinese_tokenize")
         from jieba import cut
         self.cut = cut
@@ -76,7 +81,7 @@ class TrackVocab(Col_Edge):
 
     def combine_vocab(self, new_vocab):
         combinedf = pd.concat([self.vocab, new_vocab]).groupby("token").sum().reset_index()
-        return combinedf.sort_values(by="cnt", ascending=False).reset_index().drop("index", axis=1)
+        return combinedf.sort_values(by="cnt", ascending=False).reset_index().rename(columns = {"index":"idx"})
 
     def save_vocab(self, json_url):
         self.vocab.to_json(json_url)

@@ -7,12 +7,12 @@ def recorddf(record):
 
 ## The following are the callbacks for trainer
 
-def print_all(record, dataset):
+def print_all(record):
     df = recorddf(record)
     mars(df)
 
 
-def stat(record, dataset):
+def stat(record):
     """
     Print out track statistics
     :param record: self.track[epoch] in trainer.run(self.epoch)

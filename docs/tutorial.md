@@ -274,7 +274,7 @@ Here we don't embody the optimizer or model into Trainer, that's how we can use 
 What you decide is what will happen, within an iteration, given a batch of data.
 
 
-```python
+```python 
 @trainer.step_train
 def action(batch):
     x,y = batch.data
