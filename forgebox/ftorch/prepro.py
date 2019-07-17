@@ -621,3 +621,18 @@ def split_df(df, valid=0.2, ensure_factor=2):
         if valid_mod: valid_df = valid_df[:-valid_mod]
     return train_df, valid_df
 
+
+class npNormalize(object):
+    """
+    normalize and denormalize for numpy
+    """
+    def __init__(self, v, mean=None, std=None):
+        super().__init__()
+        self.mean = v.mean() if mean == None else mean
+        self.std = v.std() if std == None else std
+
+    def normalize(self, x):
+        return (x - self.mean) / self.std
+
+    def recover(self, x):
+        return (x * self.std) + self.mean
