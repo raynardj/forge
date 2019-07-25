@@ -15,7 +15,7 @@ setup(
     scripts = ['forge/bin/forge', 'forge/bin/forge_db',],
     # package_data={'forge':['./forge/templates/*','./forge/static/*']},
     install_requires = [
-        "flask==0.12.4",
+        "flask>=1.0.0",
         "flask_appbuilder==1.10.0",
         "pandas>=0.18.0",
         "tqdm>=4.25.0",
