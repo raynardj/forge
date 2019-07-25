@@ -621,3 +621,73 @@ def split_df(df, valid=0.2, ensure_factor=2):
         if valid_mod: valid_df = valid_df[:-valid_mod]
     return train_df, valid_df
 
+
+class npNormalize(object):
+    """
+    normalize and denormalize for numpy
+    """
+    def __init__(self, v, mean=None, std=None):
+        super().__init__()
+        self.mean = v.mean() if mean == None else mean
+        self.std = v.std() if std == None else std
+
+    def normalize(self, x):
+        return (x - self.mean) / self.std
+
+    def recover(self, x):
+        return (x * self.std) + self.mean
+
+
+import random
+
+
+class historyReplay(object):
+    """
+    A historic replay scheduler for GAN training
+
+    ```python
+    replay = historyReplay(bs = 32, # batch size
+                current_ratio = 0.2 # for each batch keep 20% of the sample from the latest, default 0.2
+                history_len = 50, # how long is the replay length, default 50
+    )
+    for i in range(iters):
+        ...
+        mixed_a,mixed_b,mixed_c = replay(a,b,c)
+        ...
+    ```
+    """
+    def __init__(self, bs, current_ratio=.2, history_len=50):
+        self.current_ratio = current_ratio
+        self.counter = 0
+        self.history_len = history_len
+        self.bs = bs
+        self.argslist = []
+        self.arglen = len(self.argslist)
+        self.latest_chunk = int(bs * current_ratio)
+        self.history_chunk = bs - self.latest_chunk
+
+    def __call__(self, *args):
+        # The 1st input
+        if self.arglen == 0:
+            self.argslist = args
+            self.arglen = len(self.argslist)
+            return tuple(args) if self.arglen > 1 else tuple(args)[0]
+        else:
+            stack_size = self.argslist[0].size(0)
+            # the 2nd ~ the history length
+            if stack_size < self.bs * self.history_len:
+                self.argslist = list(torch.cat([args[i], self.argslist[i]], dim=0) for i in range(len(self.argslist)))
+                self.counter += 1
+                return tuple(args) if self.arglen > 1 else tuple(args)[0]
+            # above history length
+            else:
+                pos = self.counter % self.history_len
+                start_pos = pos * self.bs
+                end_pos = (pos + 1) * self.bs
+                slice_ = random.choices(range(self.bs * self.history_len), k=self.history_chunk)
+                rt = []
+                for i in range(len(self.argslist)):
+                    rt.append(torch.cat([args[i][:self.latest_chunk, ...], self.argslist[i][slice_, ...]], dim=0))
+                    self.argslist[i][start_pos:end_pos, ...] = args[i]
+                self.counter += 1
+                return tuple(rt) if self.arglen > 1 else tuple(rt)[0]
