@@ -31,3 +31,13 @@ class Coord2d(nn.Module):
         x = self.add_coord(x)
         x = self.conv(x)
         return x
+
+def MiniBatchDiscrimination(x):
+    """
+    To create mini batch diversity
+    applyied in discriminator in GAN
+    :param x: projected (bs,hs) tensor
+    :return: tensor in size (bs,hs)
+    """
+    bs = x.size(0)
+    return -(x.unsqueeze(0).repeat([bs,1,1])-x.unsqueeze(-1).repeat([1,1,bs]).permute(0,2,1)).sum(1)
