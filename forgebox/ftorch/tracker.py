@@ -1,6 +1,7 @@
 from ..apicore import forgedb
 from .callbacks import recorddf
 import torch
+import pandas as pd
 import os
 from datetime import datetime
 
@@ -74,3 +75,53 @@ class FG(forgedb):
 
         return f
 
+
+class loopTracker(object):
+    def __init__(self):
+        """
+        Initialize:
+        ```
+        l = loopTracker()
+        ```
+        usage:
+        ```
+        for e in range(epochs):
+            for i in range(iters):
+                x,y1,y2 = next(shuffled_data_gen)
+                y1_, y2_ = model(x)
+                # tracking data in loop like this
+                l(e, i , y1, y2, y1_, y2_)
+                ...
+
+        tracked_data_df = l.df(cols = ["epoch","iter", "y1","y2","y1_pred","y2_pred"])
+        ```
+        """
+        self.seq = list()
+
+    def __call__(self, *args):
+        self.seq.append(args)
+        return tuple(args)
+
+    def __len__(self):
+        return len(self.seq)
+
+    @property
+    def width(self):
+        if self.__len__() > 0:
+            return len(self.seq[0])
+        else:
+            return 0
+
+    def __repr__(self):
+        return "<loopTracker:Tracked %s Rows, %s Cols>" % (self.__len__(), self.width)
+
+    def df(self, cols=None):
+        """
+        cols:
+        a list of str: name of columns
+        if cols == None, the column name would be sequenced natural numbers
+        """
+        if cols == None:
+            cols = list("col_%s" % (i + 1) for i in range(self.width))
+        df = pd.DataFrame(self.seq, columns=cols)
+        return df
