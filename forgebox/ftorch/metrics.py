@@ -16,7 +16,7 @@ def metric4_bi(y_pred,y_true,bm = 0.5):
         :param bm: benchmark, default 0.5
         :return: acc,rec,prec,f1_score
     """
-    acc = accuracy_bi(y_pred, y_true)
+    acc = accuracy_bi(y_pred, y_true, bm)
     rec = recall(y_pred, y_true, bm)
     prec = precision(y_pred, y_true, bm)
     f1_ = f1(rec, prec)
